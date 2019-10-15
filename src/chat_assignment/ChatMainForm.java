@@ -12,10 +12,7 @@ import java.net.Socket;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 
-/**
- *
- * @author Meep
- */
+
 public class ChatMainForm extends JFrame {
     Socket socket;
     private static String  Accountid;
@@ -256,9 +253,11 @@ public class ChatMainForm extends JFrame {
         int confirm= JOptionPane.showConfirmDialog(null, "Logout?");
         if(confirm==0)
         {
-            this.setVisible(false);
+                dispose();
+                //this.setVisible(false);
                 LoginForm Login=new LoginForm();
                 Login.setVisible(true);
+                Login.setResizable(false);
 //            try{
 //                socket.close();
 //                this.setVisible(false);
@@ -302,6 +301,7 @@ public class ChatMainForm extends JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 JFrame menu = new ChatMainForm(Accountid);
+                menu.setDefaultCloseOperation(0);
                 menu.setVisible(true);
             }
         });

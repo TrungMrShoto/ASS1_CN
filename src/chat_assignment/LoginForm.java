@@ -1,5 +1,7 @@
+
 package chat_assignment;
 
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import javax.swing.JOptionPane;
@@ -13,7 +15,7 @@ import java.net.UnknownHostException;
 import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.swing.JFrame;
 public class LoginForm extends javax.swing.JFrame {
 
     /**
@@ -53,11 +55,21 @@ public class LoginForm extends javax.swing.JFrame {
                 txtUsernameActionPerformed(evt);
             }
         });
+        txtUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUsernameKeyPressed(evt);
+            }
+        });
 
         jButton1.setText("Log in");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+        jButton1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jButton1KeyPressed(evt);
             }
         });
 
@@ -72,6 +84,12 @@ public class LoginForm extends javax.swing.JFrame {
         ckbPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ckbPasswordActionPerformed(evt);
+            }
+        });
+
+        txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPasswordKeyPressed(evt);
             }
         });
 
@@ -131,43 +149,41 @@ public class LoginForm extends javax.swing.JFrame {
             Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    private void Connect2Server() throws UnknownHostException, IOException{
-        String userName= txtUsername.getText();
-        String userPassword=txtPassword.getText();
+    private void Connect2Server() throws UnknownHostException, IOException {
+        String userName = txtUsername.getText();
+        String userPassword = txtPassword.getText();
         Boolean flag;
-        if (!userName.isEmpty() && !userPassword.isEmpty())
-//            cnn = new Socket("localhost", 2000);
-//            BufferedWriter os =  new BufferedWriter(new OutputStreamWriter(cnn.getOutputStream()));
-//            BufferedReader is = new BufferedReader(new InputStreamReader(cnn.getInputStream()));
-//                
-//            os.write(userName + " " + userPassword);
-//            os.newLine();
-//            os.flush();
-//            if (is.readLine().equals("T"))
-//            {flag = true}
-//            else
-//            {flag = false}
-//            os.close();
-//            is.close();
-//            cnn.close();
-            if(new String("Bao").equals(userName) && new String("123456").equals(userPassword) ){
+        if (!userName.isEmpty() && !userPassword.isEmpty()) //            cnn = new Socket("localhost", 2000);
+        //            BufferedWriter os =  new BufferedWriter(new OutputStreamWriter(cnn.getOutputStream()));
+        //            BufferedReader is = new BufferedReader(new InputStreamReader(cnn.getInputStream()));
+        //                
+        //            os.write(userName + " " + userPassword);
+        //            os.newLine();
+        //            os.flush();
+        //            if (is.readLine().equals("T"))
+        //            {flag = true}
+        //            else
+        //            {flag = false}
+        //            os.close();
+        //            is.close();
+        //            cnn.close();
+        {
+            if (new String("Bao").equals(userName) && new String("123456").equals(userPassword)) {
                 dispose();
-                new ChatMainForm(userName).setVisible(true);
+                JFrame frame = new ChatMainForm(userName);
+                frame.setVisible(true);
+                frame.setDefaultCloseOperation(0);
+            } else {
+                JOptionPane.showMessageDialog(this, "Wrong Username or Password");
             }
-            else
-            {
-                JOptionPane.showMessageDialog(this,"Wrong Username or Password");
-            }
-        else {
-            JOptionPane.showMessageDialog(this,"You must fill all the blanks!!!");
+        } else {
+            JOptionPane.showMessageDialog(this, "You must fill all the blanks!!!");
         }
     }
     private void ckbPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ckbPasswordActionPerformed
-        if(ckbPassword.isSelected()){
-            txtPassword.setEchoChar((char)0);
-        }
-        else
-        {
+        if (ckbPassword.isSelected()) {
+            txtPassword.setEchoChar((char) 0);
+        } else {
             txtPassword.setEchoChar('*');
         }
 
@@ -177,6 +193,34 @@ public class LoginForm extends javax.swing.JFrame {
         dispose();
         new RegisterForm().setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton1KeyPressed
+        try {
+            Connect2Server();
+        } catch (IOException ex) {
+            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1KeyPressed
+
+    private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            try {
+                Connect2Server();
+            } catch (IOException ex) {
+                Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_txtPasswordKeyPressed
+
+    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            try {
+                Connect2Server();
+            } catch (IOException ex) {
+                Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_txtUsernameKeyPressed
 
     /**
      * @param args the command line arguments
@@ -207,14 +251,17 @@ public class LoginForm extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new LoginForm().setVisible(true);
+                JFrame frame = new LoginForm();
+                frame.setVisible(true);
+                frame.setResizable(false);
             }
         });
     }
-    
+
     private Socket cnn;
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ckbPassword;
     private javax.swing.JButton jButton1;
