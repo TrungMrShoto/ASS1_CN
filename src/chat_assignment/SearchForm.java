@@ -5,6 +5,7 @@
  */
 package chat_assignment;
 
+import java.awt.Toolkit;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -20,6 +21,8 @@ public class SearchForm extends javax.swing.JFrame {
      */
     public SearchForm() {
         initComponents();
+        setTitle("Search Friends");
+        setIcon();
     }
 
     /**
@@ -150,7 +153,10 @@ public class SearchForm extends javax.swing.JFrame {
             }
         });
     }
+private void setIcon() {
 
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/chat_assignment/res/iconfinder_flower_1055057.png")));
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
