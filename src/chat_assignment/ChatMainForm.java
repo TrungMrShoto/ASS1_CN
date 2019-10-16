@@ -18,6 +18,7 @@ public class ChatMainForm extends JFrame {
     private static String  Accountid;
     /**
      * Creates new form ChatMainForm
+     * @param id
      */
     public ChatMainForm(String id) {
         
