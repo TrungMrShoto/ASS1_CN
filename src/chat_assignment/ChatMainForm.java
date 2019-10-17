@@ -48,8 +48,8 @@ public class ChatMainForm extends JFrame {
     
     private static  int numOFriend=19;
     private static String  Accountid="Sub";
-    private static String[] Friendslist;
-    private static List<User> UserFriendsList=null;
+    private static List<String> Friendslist=new ArrayList<String>();;
+    private static List<User> UserFriendsList;
     private static String final_sendUser="xx";
     /**
      * Creates new form ChatMainForm
@@ -57,13 +57,17 @@ public class ChatMainForm extends JFrame {
     public ChatMainForm(String id,List<User> friendList) {
         setIcon();
         Accountid=id;
-        System.out.println("what: "+ friendList.get(0).getUser_name());
-        UserFriendsList=friendList;
-        setTitle("Chat Room");
-        this.getRootPane().setDefaultButton(btnSend);
+        
+        if(friendList!=null){
+            UserFriendsList=friendList;
+            System.out.println("what: "+ friendList.get(0).getUser_name());
+        }
+        else UserFriendsList=null;
+        setTitle("Chat Room");                
         initComponents();
-        AttributeSetup();
-        setTabValue_Friends();     
+        AttributeSetup();        
+        this.getRootPane().setDefaultButton(btnSend);
+        setTabValue_Friends();
         //JOptionPane.showMessageDialog(this,"Welcome" + Accountid);
        
     }
@@ -383,11 +387,15 @@ public class ChatMainForm extends JFrame {
         });
     }
     private void setTabValue_Friends(){
-        String[] name={"Lulu","Relu","Closure","a","g","ag","wgaw,","wgawa","gawgwa","gawgwa","gawgwa","gawgaw","gawgwa","gawgwa","gawgwag,","awgwa","gawegaw123123"};
-//        String[] name=null;
-//        if(Friendslist!=null){
-//            name=Friendslist;
+//        String[] name={"Lulu","Relu","Closure","a","g","ag","wgaw,","wgawa","gawgwa","gawgwa","gawgwa","gawgaw","gawgwa","gawgwa","gawgwag,","awgwa","gawegaw123123"};
+////        String[] name=null;
+        List<String> name= new ArrayList<String>();
+        if(Friendslist!=null)
+            name=Friendslist;
+//        
+        if(!(name.isEmpty())){
         boolean[] onl={true,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true};
+        List<Boolean> online=new ArrayList<Boolean>();
         listOfFriendButton.clear();
 //        jPanel1.setLayout( new FlowLayout() );
         int i=0;
@@ -395,11 +403,11 @@ public class ChatMainForm extends JFrame {
         int co_y=50*i;
         int panel_weight=220;
         int panel_height=50;
-        numOFriend=name.length;
-        for( i=0;i<name.length;i++)
+        numOFriend=name.size();
+        for( i=0;i<name.size();i++)
         {
             co_y=50*i;
-             String temp="JButton_"+name[i];
+             String temp="JButton_"+name.get(i);
              JButton btn= new JButton(temp);
              listOfFriendButton.add(btn);
 //             btn.setOnAction(new EventHandler<ActionEvent>() {
@@ -529,23 +537,26 @@ public class ChatMainForm extends JFrame {
              onl_icon.setBounds(co_x+220+8, co_y, panel_weight, panel_height);             
              jPanel1.add(onl_icon);                        
              }            
-             btn.setText(name[i]);            
+             btn.setText(name.get(i));            
              jPanel1.add(btn);
         }
         
-        
+        }
     }
     private void AttributeSetup(){
-//        if(UserFriendsList!=null)
-//        {
-//            if(!UserFriendsList.isEmpty())
-//        {
-//            for (int i=0;i< UserFriendsList.size();i++){
-//                System.out.println("item get: " + UserFriendsList.get(i).getUser_name());
-//                Friendslist[i]=UserFriendsList.get(i).getUser_name();
-//            }
-//        }
-//        }
+        if(UserFriendsList!=null)
+        {
+            System.out.println("User is not null");
+            if(!UserFriendsList.isEmpty())
+            {
+                for (int i=0;i< UserFriendsList.size();i++){
+                    String x=UserFriendsList.get(i).getUser_name();                    
+                    Friendslist.add(x);                    
+                }
+            }
+        }
+        else
+            Friendslist=null;
 //        txtMesslog.setLineWrap(true);
 //        txtMesslog.setWrapStyleWord(true);
         txtMessage.requestFocus();
