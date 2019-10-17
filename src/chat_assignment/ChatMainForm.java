@@ -5,6 +5,7 @@
  */
 package chat_assignment;
 
+import commom.User;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -19,15 +20,23 @@ import java.net.Socket;
 
 import java.awt.Color;
 import java.awt.Toolkit;
+
 import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import static javafx.scene.paint.Color.color;
 import javax.swing.JButton;
+import javafx.scene.control.Button;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 /**
  *
@@ -35,18 +44,21 @@ import javax.swing.JTextField;
  */
 public class ChatMainForm extends JFrame {
     Socket socket;
+    List<JButton> listOfFriendButton = new ArrayList<>();
     
     private static  int numOFriend=19;
     private static String  Accountid="Sub";
     private static String[] Friendslist;
-    
+    private static List<User> UserFriendsList=null;
     private static String final_sendUser="xx";
     /**
      * Creates new form ChatMainForm
      */
-    public ChatMainForm(String id) {
-setIcon();
-        Accountid=id;        
+    public ChatMainForm(String id,List<User> friendList) {
+        setIcon();
+        Accountid=id;
+        System.out.println("what: "+ friendList.get(0).getUser_name());
+        UserFriendsList=friendList;
         setTitle("Chat Room");
         this.getRootPane().setDefaultButton(btnSend);
         initComponents();
@@ -71,6 +83,8 @@ setIcon();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel6 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
         btnSend = new javax.swing.JButton();
         btnClip = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -80,6 +94,7 @@ setIcon();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
 
@@ -120,6 +135,21 @@ setIcon();
         jScrollPane2.setViewportView(jPanel6);
 
         jTabbedPane2.addTab("Request", jScrollPane2);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 298, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 610, Short.MAX_VALUE)
+        );
+
+        jScrollPane4.setViewportView(jPanel2);
+
+        jTabbedPane2.addTab("Group", jScrollPane4);
 
         btnSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_send-01_186386.png"))); // NOI18N
         btnSend.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -179,6 +209,10 @@ setIcon();
             }
         });
         jMenu2.add(jMenuItem1);
+
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_internet-group-chat_118807.png"))); // NOI18N
+        jMenuItem4.setText("Create Group");
+        jMenu2.add(jMenuItem4);
 
         jMenuBar1.add(jMenu2);
 
@@ -343,15 +377,18 @@ setIcon();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                JFrame menu = new ChatMainForm(Accountid);
+                JFrame menu = new ChatMainForm(Accountid,UserFriendsList);
                 menu.setVisible(true);
             }
         });
     }
     private void setTabValue_Friends(){
         String[] name={"Lulu","Relu","Closure","a","g","ag","wgaw,","wgawa","gawgwa","gawgwa","gawgwa","gawgaw","gawgwa","gawgwa","gawgwag,","awgwa","gawegaw123123"};
+//        String[] name=null;
+//        if(Friendslist!=null){
+//            name=Friendslist;
         boolean[] onl={true,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true};
-        
+        listOfFriendButton.clear();
 //        jPanel1.setLayout( new FlowLayout() );
         int i=0;
         int co_x=10;
@@ -362,8 +399,119 @@ setIcon();
         for( i=0;i<name.length;i++)
         {
             co_y=50*i;
-             String temp="JButton"+i;
+             String temp="JButton_"+name[i];
              JButton btn= new JButton(temp);
+             listOfFriendButton.add(btn);
+//             btn.setOnAction(new EventHandler<ActionEvent>() {
+//        @Override public void handle(ActionEvent actionEvent) {
+//            System.out.println("from: "+temp);
+//        }
+//    });
+        btn.addActionListener(new java.awt.event.ActionListener() {
+//            boolean init=true;
+            String title=temp.replace("JButton_", "");
+            JFrame jf=new JFrame("Chat: "+title);
+            InitChatFrame checkthis= new InitChatFrame(title);
+            
+            public void actionPerformed(java.awt.event.ActionEvent evt) {                                
+//                init=InitNewChatJFrame(init);                                
+                checkthis.setVisible(true);
+                
+                final_sendUser="xxx";
+                for(int i=0;i< listOfFriendButton.size();i++)
+                {                    
+                    if(listOfFriendButton.get(i)!=btn)
+                        listOfFriendButton.get(i).setBackground(new JButton().getBackground());
+                }
+                txtMesslog.setText("");
+                btn.setBackground(Color.cyan);
+                System.out.println("From: "+temp);
+            }
+
+//                private boolean InitNewChatJFrame(boolean init) {
+//                    String title=temp.replace("JButton_", "");
+////                    JFrame jf=new JFrame("Chat: "+title);
+//                    if(init==true){
+//                    javax.swing.JButton btnClip;
+//                    javax.swing.JButton btnSend;
+//                    javax.swing.JScrollPane jScrollPane1;
+//                    javax.swing.JTextPane jTextPane1;
+//                    javax.swing.JTextField txtInput;
+//                    
+//                    
+//                    jScrollPane1 = new javax.swing.JScrollPane();
+//                    jTextPane1 = new javax.swing.JTextPane();
+//                    txtInput = new javax.swing.JTextField();
+//                    btnSend = new javax.swing.JButton();
+//                    btnClip = new javax.swing.JButton();
+//
+//                    jf.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+//
+//                    jTextPane1.setEditable(false);
+//                    jScrollPane1.setViewportView(jTextPane1);
+//
+//                    btnSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_send-01_186386.png"))); // NOI18N
+//                    btnSend.addMouseListener(new java.awt.event.MouseAdapter() {
+//                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+//                            btnSendMouseClicked(evt);
+//                        }
+//                    });
+//                    btnSend.addActionListener(new java.awt.event.ActionListener() {
+//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                            String input = txtInput.getText();
+//                            jTextPane1.setText(jTextPane1.getText()+input);
+//                            txtInput.setText("");
+////                               Append_Message(txtInput,"Bao",Color.CYAN);
+//                        }
+//                    });
+//                    btnSend.addKeyListener(new java.awt.event.KeyAdapter() {
+//                        public void keyPressed(java.awt.event.KeyEvent evt) {
+//                            btnSendKeyPressed(evt);
+//                        }
+//                    });
+//
+//                    btnClip.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_clip_115756.png"))); // NOI18N
+//
+//                    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(jf.getContentPane());
+//                    jf.getContentPane().setLayout(layout);
+//                    layout.setHorizontalGroup(
+//                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addComponent(jScrollPane1)
+//                        .addGroup(layout.createSequentialGroup()
+//                            .addComponent(txtInput, javax.swing.GroupLayout.PREFERRED_SIZE, 661, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//                            .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                            .addGap(10, 10, 10)
+//                            .addComponent(btnClip, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE))
+//                    );
+//                    layout.setVerticalGroup(
+//                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//                        .addGroup(layout.createSequentialGroup()
+//                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+//                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+//                                .addComponent(txtInput, javax.swing.GroupLayout.Alignment.LEADING)
+//                                .addComponent(btnSend, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+//                                .addComponent(btnClip, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+//                            .addGap(0, 20, Short.MAX_VALUE))
+//                    );
+//            //        jTextPane1.setText("Hello: "+temp);
+//                    jf.setLocation(300,300);
+//                    jf.setVisible(true);
+//                    jf.pack();
+//        
+//                        System.out.println("One Time");
+//        
+//                }
+//                    else{
+//                        
+//                            jf.setVisible(true);
+//                        
+//                    }
+//                    return false;
+//                }
+                
+        });            
              btn.setBounds(co_x, co_y, panel_weight, panel_height);
              if(onl[i]==true)
              {
@@ -388,6 +536,16 @@ setIcon();
         
     }
     private void AttributeSetup(){
+//        if(UserFriendsList!=null)
+//        {
+//            if(!UserFriendsList.isEmpty())
+//        {
+//            for (int i=0;i< UserFriendsList.size();i++){
+//                System.out.println("item get: " + UserFriendsList.get(i).getUser_name());
+//                Friendslist[i]=UserFriendsList.get(i).getUser_name();
+//            }
+//        }
+//        }
 //        txtMesslog.setLineWrap(true);
 //        txtMesslog.setWrapStyleWord(true);
         txtMessage.requestFocus();
@@ -414,8 +572,7 @@ setIcon();
             Mess_content( content);           
         }
     }
-    private void Mess_header(String header,Color color){
-       System.out.println("Last send: "+ final_sendUser);
+    private void Mess_header(String header,Color color){       
         if(!header.equals(final_sendUser) )
         {
             int len = txtMesslog.getDocument().getLength();
@@ -430,8 +587,7 @@ setIcon();
             txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.MAGENTA, "San Francisco", 13), false);  
             for(int i=0;i<header.length()+3;i++)
                 txtMesslog.replaceSelection(" ");
-        }
-        System.out.println("Last send: "+ final_sendUser);
+        }        
         final_sendUser=header;
     }
     private void Mess_content(String content){
@@ -454,11 +610,14 @@ setIcon();
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextField txtMessage;
     private javax.swing.JTextPane txtMesslog;

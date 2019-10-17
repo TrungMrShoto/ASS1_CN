@@ -18,3 +18,5 @@ main icon
 https://www.iconfinder.com/icons/1055057/flower_nature_plant_icon
 lock
 https://www.iconfinder.com/icons/111044/closed_lock_secure_icon
+internet-group-chat
+https://www.iconfinder.com/icons/118807/chat_group_icon
