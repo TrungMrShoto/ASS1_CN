@@ -1,12 +1,13 @@
 package chat_assignment;
 
+import java.awt.Toolkit;
 import javax.swing.JOptionPane;
 
 public class RegisterForm extends javax.swing.JFrame {
 
     public RegisterForm() {
         setTitle("Register");
-        initComponents();
+        initComponents();setIcon();
     }
 
     /**
@@ -189,7 +190,10 @@ public class RegisterForm extends javax.swing.JFrame {
             }
         });
     }
+private void setIcon() {
 
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/chat_assignment/res/iconfinder_flower_1055057.png")));
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ckbPassword;
     private javax.swing.JButton jButton1;

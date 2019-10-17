@@ -1,6 +1,11 @@
-
 package chat_assignment;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
+import java.awt.KeyboardFocusManager;
+import java.awt.List;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,9 +18,11 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
+import javax.swing.ImageIcon;
+
 public class LoginForm extends javax.swing.JFrame {
 
     /**
@@ -23,7 +30,12 @@ public class LoginForm extends javax.swing.JFrame {
      */
     public LoginForm() {
         setTitle("Welcome to our Chat Room");
+        setIcon();
         initComponents();
+        turnoffTabTraversal();
+        this.setFocusTraversalPolicyProvider(true);
+        this.getRootPane().setDefaultButton(jButton1);
+       
     }
 
     /**
@@ -43,11 +55,16 @@ public class LoginForm extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         ckbPassword = new javax.swing.JCheckBox();
         txtPassword = new javax.swing.JPasswordField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Username");
 
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Password");
 
         txtUsername.addActionListener(new java.awt.event.ActionListener() {
@@ -61,7 +78,7 @@ public class LoginForm extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Log in");
+        jButton1.setText("Sign in");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -79,6 +96,11 @@ public class LoginForm extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
+        jButton2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jButton2KeyPressed(evt);
+            }
+        });
 
         ckbPassword.setText("Show Password");
         ckbPassword.addActionListener(new java.awt.event.ActionListener() {
@@ -93,6 +115,11 @@ public class LoginForm extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+        jLabel3.setText("LOGIN");
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_102_111044.png"))); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -106,7 +133,7 @@ public class LoginForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(ckbPassword)
-                        .addGap(0, 277, Short.MAX_VALUE))
+                        .addGap(0, 264, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtUsername)
@@ -116,11 +143,25 @@ public class LoginForm extends javax.swing.JFrame {
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(55, 55, 55)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel4)
+                        .addGap(32, 32, 32)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -132,14 +173,14 @@ public class LoginForm extends javax.swing.JFrame {
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ckbPassword)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
-        // TODO add your handling code here:
+                // TODO add your handling code here:
     }//GEN-LAST:event_txtUsernameActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -149,41 +190,43 @@ public class LoginForm extends javax.swing.JFrame {
             Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    private void Connect2Server() throws UnknownHostException, IOException {
-        String userName = txtUsername.getText();
-        String userPassword = txtPassword.getText();
+    private void Connect2Server() throws UnknownHostException, IOException{
+        String userName= txtUsername.getText();
+        String userPassword=txtPassword.getText();
         Boolean flag;
-        if (!userName.isEmpty() && !userPassword.isEmpty()) //            cnn = new Socket("localhost", 2000);
-        //            BufferedWriter os =  new BufferedWriter(new OutputStreamWriter(cnn.getOutputStream()));
-        //            BufferedReader is = new BufferedReader(new InputStreamReader(cnn.getInputStream()));
-        //                
-        //            os.write(userName + " " + userPassword);
-        //            os.newLine();
-        //            os.flush();
-        //            if (is.readLine().equals("T"))
-        //            {flag = true}
-        //            else
-        //            {flag = false}
-        //            os.close();
-        //            is.close();
-        //            cnn.close();
-        {
-            if (new String("Bao").equals(userName) && new String("123456").equals(userPassword)) {
+        if (!userName.isEmpty() && !userPassword.isEmpty())
+//            cnn = new Socket("localhost", 2000);
+//            BufferedWriter os =  new BufferedWriter(new OutputStreamWriter(cnn.getOutputStream()));
+//            BufferedReader is = new BufferedReader(new InputStreamReader(cnn.getInputStream()));
+//                
+//            os.write(userName + " " + userPassword);
+//            os.newLine();
+//            os.flush();
+//            if (is.readLine().equals("T"))
+//            {flag = true}
+//            else
+//            {flag = false}
+//            os.close();
+//            is.close();
+//            cnn.close();
+            if(new String("Bao").equals(userName) && new String("123456").equals(userPassword) ){
                 dispose();
-                JFrame frame = new ChatMainForm(userName);
-                frame.setVisible(true);
-                frame.setDefaultCloseOperation(0);
-            } else {
-                JOptionPane.showMessageDialog(this, "Wrong Username or Password");
+                new ChatMainForm(userName).setVisible(true);
             }
-        } else {
-            JOptionPane.showMessageDialog(this, "You must fill all the blanks!!!");
+            else
+            {
+                JOptionPane.showMessageDialog(this,"Wrong Username or Password");
+            }
+        else {
+            JOptionPane.showMessageDialog(this,"You must fill all the blanks!!!");
         }
     }
     private void ckbPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ckbPasswordActionPerformed
-        if (ckbPassword.isSelected()) {
-            txtPassword.setEchoChar((char) 0);
-        } else {
+        if(ckbPassword.isSelected()){
+            txtPassword.setEchoChar((char)0);
+        }
+        else
+        {
             txtPassword.setEchoChar('*');
         }
 
@@ -195,32 +238,25 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton1KeyPressed
-        try {
-            Connect2Server();
-        } catch (IOException ex) {
-            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        if(evt.getKeyCode()== KeyEvent.VK_TAB)
+            jButton2.requestFocus();
+        
     }//GEN-LAST:event_jButton1KeyPressed
 
+    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
+        if(evt.getKeyChar() == KeyEvent.VK_TAB)
+            txtPassword.requestFocus();      
+    }//GEN-LAST:event_txtUsernameKeyPressed
+
     private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            try {
-                Connect2Server();
-            } catch (IOException ex) {
-                Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        if(evt.getKeyCode()== KeyEvent.VK_TAB)
+            jButton1.requestFocus();
     }//GEN-LAST:event_txtPasswordKeyPressed
 
-    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            try {
-                Connect2Server();
-            } catch (IOException ex) {
-                Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }//GEN-LAST:event_txtUsernameKeyPressed
+    private void jButton2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton2KeyPressed
+        if(evt.getKeyCode()== KeyEvent.VK_TAB)
+            txtUsername.requestFocus();
+    }//GEN-LAST:event_jButton2KeyPressed
 
     /**
      * @param args the command line arguments
@@ -251,25 +287,34 @@ public class LoginForm extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
             public void run() {
-                JFrame frame = new LoginForm();
-                frame.setVisible(true);
-                frame.setResizable(false);
+                new LoginForm().setVisible(true);
             }
         });
     }
-
+    private void turnoffTabTraversal(){
+        jButton1.setFocusTraversalKeysEnabled(false);
+        jButton2.setFocusTraversalKeysEnabled(false);
+        txtUsername.setFocusTraversalKeysEnabled(false);
+        txtPassword.setFocusTraversalKeysEnabled(false);
+    }
     private Socket cnn;
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ckbPassword;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
+
+    private void setIcon() {
+
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/chat_assignment/res/iconfinder_flower_1055057.png")));
+    }
 }
