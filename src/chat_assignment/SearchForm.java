@@ -5,24 +5,66 @@
  */
 package chat_assignment;
 
+import commom.TagReader;
+import commom.TagValue;
+import commom.TagWriter;
+import commom.Tags;
+import commom.User;
+import java.awt.Component;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import javafx.scene.control.TableColumn;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 /**
  *
  * @author Meep
  */
 public class SearchForm extends javax.swing.JFrame {
-
+    static Socket conn;
+    private TagReader reader;
+    private TagWriter writer;
     /**
      * Creates new form SearchForm
      */
     public SearchForm() {
-        initComponents();
+        initComponents();       
         setTitle("Search Friends");
         setIcon();
+        noRes.setVisible(false);
+         pack();
+        
+        
     }
 
     /**
@@ -37,14 +79,22 @@ public class SearchForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         txtSearchinput = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        noRes = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
         tblSearchoutput = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("Search");
 
         txtSearchinput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSearchinputActionPerformed(evt);
+            }
+        });
+        txtSearchinput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchinputKeyPressed(evt);
             }
         });
 
@@ -60,18 +110,26 @@ public class SearchForm extends javax.swing.JFrame {
             }
         });
 
+        noRes.setForeground(new java.awt.Color(255, 51, 0));
+        noRes.setText("No Result Found");
+
         tblSearchoutput.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Name", "IP_address", "Status", "Add_Friend", "Button"
             }
-        ));
-        jScrollPane1.setViewportView(tblSearchoutput);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(tblSearchoutput);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -80,16 +138,16 @@ public class SearchForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addContainerGap())
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 499, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtSearchinput, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addGap(215, 215, 215))))
+                        .addComponent(txtSearchinput, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(noRes)))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,9 +156,11 @@ public class SearchForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jButton1)
-                    .addComponent(txtSearchinput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
+                    .addComponent(txtSearchinput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(noRes))
+                .addGap(28, 28, 28)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         pack();
@@ -116,8 +176,15 @@ public class SearchForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        SearchFriend();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void txtSearchinputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchinputKeyPressed
+        if(evt.getKeyCode()==KeyEvent.VK_ENTER)
+        {            
+            SearchFriend();
+        }
+    }//GEN-LAST:event_txtSearchinputKeyPressed
 
     /**
      * @param args the command line arguments
@@ -161,7 +228,148 @@ private void setIcon() {
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel noRes;
     private javax.swing.JTable tblSearchoutput;
     private javax.swing.JTextField txtSearchinput;
     // End of variables declaration//GEN-END:variables
+
+    private void SearchFriend() {
+    
+    String input = txtSearchinput.getText();
+    DefaultTableModel model = (DefaultTableModel) tblSearchoutput.getModel();
+//    model.setDataVector(new Object[][]{}, new Object[]{});
+    model.setRowCount(0);
+//    model.addRow(new Object[]{"Column 1", "Column 2", "Column 3"});
+       
+        try {
+            tblSearchoutput= new JTable(model);
+                 
+            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            reader = new TagReader(conn.getInputStream());  
+            writer = new TagWriter(conn.getOutputStream()); 
+            String[] request = {Tags.SEARCH, "<"+input+">"};
+            TagValue tv = new TagValue(request[0], request[1].getBytes());
+            writer.writeTag(tv);
+            writer.flush();
+            tv = reader.getTagValue();            
+            if(tv.getTag().equals(Tags.SUCCESS)){
+                noRes.setVisible(false);
+                List<User> users= getContent(tv.getContent());
+                for(int i=0;i<users.size();i++){
+                    
+                    String name= users.get(i).getUser_name();
+                    String IP=users.get(i).getIP_addr();
+                    int status= users.get(i).getStatus();
+                    
+                    
+                    
+//                    JButton btn= new JButton("JButton_"+i);  
+//                    model.setDataVector(new Object[][]{{name,IP,status}}, new Object[]{"Name","Button"});
+                    model.addRow(new Object[]{name,IP,status});                     
+                    tblSearchoutput.getColumn("Button").setCellRenderer(new ButtonRenderer());
+                    tblSearchoutput.getColumn("Button").setCellEditor( new ButtonEditor(new JCheckBox()));
+                }
+                txtSearchinput.setText("");
+            }
+            else
+            {
+                noRes.setVisible(true);
+            }            
+            
+        } catch (Exception e) {
+            System.err.println("Network error");
+        }
+    }
+    private List<User> getContent(byte[] content){
+        String s= new String(content);
+        s = s.replace("<", "");
+        s = s.replace(">", "");
+        
+        String[] arrString = s.split("\\|");
+        List<User> users = new ArrayList<>();
+        
+        for (String str : arrString) {
+            String[] arrAttr = str.split(" ");
+            users.add(new User(Integer.parseInt(arrAttr[0]), arrAttr[1], arrAttr[2], Integer.parseInt(arrAttr[3])));
+        }
+        
+        return users;
+    }
+
+   
+    
+}
+class ButtonRenderer extends JButton implements TableCellRenderer {
+
+  public ButtonRenderer() {
+    setOpaque(true);
+  }
+
+  public Component getTableCellRendererComponent(JTable table, Object value,
+      boolean isSelected, boolean hasFocus, int row, int column) {
+    if (isSelected) {
+      setForeground(table.getSelectionForeground());
+      setBackground(table.getSelectionBackground());
+    } else {
+      setForeground(table.getForeground());
+      setBackground(UIManager.getColor("Button.background"));
+    }
+    setText((value == null) ? "" : value.toString());
+    return this;
+  }
+}
+
+class ButtonEditor extends DefaultCellEditor {
+  protected JButton button;
+
+  private String label;
+
+  private boolean isPushed;
+
+  public ButtonEditor(JCheckBox checkBox) {
+    super(checkBox);
+    button = new JButton();
+    button.setOpaque(true);
+    button.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        fireEditingStopped();
+      }
+    });
+  }
+
+  public Component getTableCellEditorComponent(JTable table, Object value,
+      boolean isSelected, int row, int column) {
+    if (isSelected) {
+      button.setForeground(table.getSelectionForeground());
+      button.setBackground(table.getSelectionBackground());
+    } else {
+      button.setForeground(table.getForeground());
+      button.setBackground(table.getBackground());
+    }
+    label = (value == null) ? "" : value.toString();
+    button.setText(label);
+    isPushed = true;
+    return button;
+  }
+
+  public Object getCellEditorValue() {
+    if (isPushed) {
+      // 
+      // 
+      JOptionPane.showMessageDialog(button, label + ": Ouch!");
+      // System.out.println(label + ": Ouch!");
+    }
+    isPushed = false;
+    return new String(label);
+  }
+
+  public boolean stopCellEditing() {
+    isPushed = false;
+    return super.stopCellEditing();
+  }
+
+  protected void fireEditingStopped() {
+    super.fireEditingStopped();
+  }
 }

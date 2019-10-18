@@ -5,32 +5,86 @@
  */
 package chat_assignment;
 
+import commom.User;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
  * @author Meep
  */
 public class InitChatFrame extends javax.swing.JFrame {
-Socket socket;
+
+    //private static ServerThread serverSocket=null;
     List<JButton> listOfFriendButton = new ArrayList<>();
-    
-    private static  int numOFriend=19;
-    private static String  Accountid="Sub";
+
+    private static int numOFriend = 19;
     private static String[] Friendslist;
-    
-    private static String final_sendUser="xx";
+    private BufferedReader buffered = null;
+    private static String final_sendUser = "xx";
+    private static Socket friendSocket = null;
+    private static String Friend_name;
+    private static String IP_friend;
+    private static String myIP;
+    private static String MyName;
     /**
      * Creates new form check
+     *
+     * @param title
+     * @param server
+     * @param IP
+     * @param username
+     * @throws java.io.IOException
      */
-    public InitChatFrame(String title) {
-        setTitle(title);
+    public InitChatFrame(String title, ServerThread server, String IP_friend, String username_friend,String myIP, String MyName) throws IOException {
+        this.txtMesslog.setEditable(false);
+        this.Friend_name = username_friend;
+        this.IP_friend = IP_friend;
+        this.myIP = myIP;
+        this.MyName = MyName;
+        //this.serverSocket = server;
+        //buffered = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        //this.setTitle(title);
+//        try {
+//            friendSocket = new Socket(InetAddress.getByAddress(this.IP_friend.getBytes()).getCanonicalHostName(), 5001);
+//            new PeerThread(friendSocket, txtMesslog).start();
+//        } catch (IOException | NumberFormatException e) {
+//            if (friendSocket != null) {
+//                friendSocket.close();
+//            } else {
+//                JOptionPane.showMessageDialog(this, "invalid input");
+//                System.exit(0);
+//            }
+//        }
         initComponents();
+        //buffered = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        
+
+    }
+
+    InitChatFrame(String title, ServerThread serverThread, User get) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
@@ -66,6 +120,11 @@ Socket socket;
         });
 
         btnClip.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_clip_115756.png"))); // NOI18N
+        btnClip.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClipActionPerformed(evt);
+            }
+        });
 
         txtMesslog.setEditable(false);
         jScrollPane3.setViewportView(txtMesslog);
@@ -120,24 +179,79 @@ Socket socket;
     }//GEN-LAST:event_btnSendMouseClicked
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        SendMessage();
+        communicate();
     }//GEN-LAST:event_btnSendActionPerformed
 
     private void btnSendKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnSendKeyPressed
-        if(evt.getKeyCode()==KeyEvent.VK_ENTER)
-        {
-            System.out.println("Ues");
-            SendMessage();
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            communicate();
         }
     }//GEN-LAST:event_btnSendKeyPressed
 
     private void txtMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMessageKeyPressed
-        if(evt.getKeyCode()==KeyEvent.VK_ENTER)
-        {
-            System.out.println("Ues");
-            SendMessage();
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            communicate();
         }
     }//GEN-LAST:event_txtMessageKeyPressed
+
+    private void communicate() {
+        try {
+            boolean flag = true;
+            OUTER:
+            while (flag) {
+                String message = buffered.readLine();
+                switch (message) {
+                    case "@e": //thoat chuong trinh
+                        break OUTER;
+                    default:
+                        if (message.isEmpty())
+                            message = " ";
+                        StringWriter stringW = new StringWriter();
+                        stringW.append("@m:<"+this.IP_friend+"><"+this.myIP+">[" + this.MyName + "]:\t" + message);
+                        serverSocket.sendMessage(stringW.toString());
+                        SendMessage(message);
+                        break;
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+    private void btnClipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClipActionPerformed
+        BufferedReader bis;
+        JFileChooser choosefile = new JFileChooser("d:");
+        choosefile.setAcceptAllFileFilterUsed(false);
+        choosefile.setDialogTitle("Select file");
+        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+        choosefile.addChoosableFileFilter(restrict);
+        int conditionOfChooseFile = choosefile.showOpenDialog(null);
+        if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+            File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+            if (file.length() <= 5242880) {
+                try {
+                    //byte[] myarray = new byte[(int) file.length()];
+                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                    StringWriter stringW = new StringWriter();
+                    stringW.append("@f:<"+this.IP_friend+"><"+this.myIP+"><" + this.MyName + "><" + file.getName() + ">");
+                    int n;
+                    char[] buff = new char[1024];
+                    while ((n = bis.read(buff)) != -1) {
+                        stringW.write(buff, 0, n);
+                    }
+                    serverSocket.sendMessage(stringW.toString());
+                    //txtMesslog.setText(txtMesslog.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+            }
+        }
+        txtMessage.setText("");
+    }//GEN-LAST:event_btnClipActionPerformed
 
     /**
      * @param args the command line arguments
@@ -170,36 +284,46 @@ Socket socket;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new InitChatFrame("").setVisible(true);
+                
+                try {
+                    JFrame chatFrame = new InitChatFrame("",serverSocket,IP_friend,Friend_name,myIP,MyName);
+                    chatFrame.setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //chatFrame.setTitle(title);
+                
+                
             }
         });
     }
-private void SendMessage(){
-        String input= txtMessage.getText();
-        String sender=Accountid;
-        Color color= Color.BLUE;
-        Append_Message(sender,input,color);
+    private void SendMessage(String input) {
+        //String input = txtMessage.getText();
+        //String sender = Accountid;
+        Color color = Color.BLUE;
+        Append_Message(this.MyName, input, color);
 //        txtMesslog.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 //        txtMesslog.setText(txtMesslog.getText()+"\n"+input);
 ////        txtMesslog.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         txtMessage.setText("");
     }
-private void Append_Message(String header,String content,Color headCol){
-        if(!content.isEmpty())
-        {
-            Mess_header( header,headCol);
-            Mess_content( content);           
+
+    private void Append_Message(String header, String content, Color headCol) {
+        if (!content.isEmpty()) {
+            Mess_header(header, headCol);
+            Mess_content(content);
         }
     }
-    private void Mess_header(String header,Color color){       
+
+    private void Mess_header(String header, Color color) {
 //        if(!header.equals(final_sendUser) )
 //        {
-            txtMesslog.setEditable(true);
-            int len = txtMesslog.getDocument().getLength();
-            txtMesslog.setCaretPosition(len);       
-            txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 13), false);        
-            txtMesslog.replaceSelection(header+":");
-            txtMesslog.setEditable(false);
+        txtMesslog.setEditable(true);
+        int len = txtMesslog.getDocument().getLength();
+        txtMesslog.setCaretPosition(len);
+        txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 16), false);
+        txtMesslog.replaceSelection("["+header + "]:");
+        txtMesslog.setEditable(false);
 //        }
 //        else
 //        {
@@ -213,14 +337,16 @@ private void Append_Message(String header,String content,Color headCol){
 //        }        
 //        final_sendUser=header;
     }
-    private void Mess_content(String content){
+
+    private void Mess_content(String content) {
         txtMesslog.setEditable(true);
         int len = txtMesslog.getDocument().getLength();
-        txtMesslog.setCaretPosition(len);       
-        txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false); 
-        txtMesslog.replaceSelection(content+"\n");
+        txtMesslog.setCaretPosition(len);
+        txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false);
+        txtMesslog.replaceSelection(content + "\n");
         txtMesslog.setEditable(false);
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClip;
     private javax.swing.JButton btnSend;

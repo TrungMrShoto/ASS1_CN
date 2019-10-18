@@ -20,6 +20,7 @@ public class ServerThread extends Thread{
 			while (true)
 			{
 				ServerThreadThread serverTT = new ServerThreadThread(serverSocket.accept(), this);
+                                Thread.sleep(3000);
 				serverTTs.add(serverTT);
 				serverTT.start();
 			}

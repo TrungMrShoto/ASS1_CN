@@ -30,44 +30,48 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 public class LoginForm extends javax.swing.JFrame {
+
     private Socket conn;
     private TagReader reader;
     private TagWriter writer;
     private String[] request;
-    
+
     /**
      * Creates new form LoginForm
      */
-    public String getPublicIP() throws IOException{
+    public String getPublicIP() throws IOException {
 
         // Find public IP address 
-        String systemipaddress = ""; 
+        String systemipaddress = "";
 
-        URL url_name = new URL("http://bot.whatismyipaddress.com"); 
+        URL url_name = new URL("http://bot.whatismyipaddress.com");
 
-        BufferedReader sc = 
-        new BufferedReader(new InputStreamReader(url_name.openStream())); 
+        BufferedReader sc
+                = new BufferedReader(new InputStreamReader(url_name.openStream()));
 
         // reads system IPAddress 
-        systemipaddress = sc.readLine().trim(); 
+        systemipaddress = sc.readLine().trim();
         return systemipaddress;
     }
-    private java.util.List<User> getUsers(byte [] content){
+
+    private java.util.List<User> getUsers(byte[] content) {
         String string = new String(content);
         string = string.replace("<", "");
         string = string.replace(">", "");
-        
+
         String[] arrString = string.split("\\|");
         java.util.List<User> users = new ArrayList<>();
-        
+
         for (String str : arrString) {
             String[] arrAttr = str.split(" ");
             users.add(new User(Integer.parseInt(arrAttr[0]), arrAttr[1], arrAttr[2], Integer.parseInt(arrAttr[3])));
         }
         return users;
     }
+
     public LoginForm() {
         setTitle("Welcome to our Chat Room");
         setIcon();
@@ -75,7 +79,7 @@ public class LoginForm extends javax.swing.JFrame {
         turnoffTabTraversal();
         this.setFocusTraversalPolicyProvider(true);
         this.getRootPane().setDefaultButton(jButton1);
-       
+
     }
 
     /**
@@ -220,7 +224,7 @@ public class LoginForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
-                // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_txtUsernameActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -230,60 +234,51 @@ public class LoginForm extends javax.swing.JFrame {
             Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    private void Connect2Server() throws UnknownHostException, IOException{
-        conn= new Socket(InetAddress.getLocalHost(),9000);
-            reader=new TagReader(conn.getInputStream());
-            writer=new TagWriter(conn.getOutputStream());
-        String userName= txtUsername.getText();
-        String userPassword=txtPassword.getText();
+    private void Connect2Server() throws UnknownHostException, IOException {
+        conn = new Socket(InetAddress.getLocalHost(), 9000);
+        reader = new TagReader(conn.getInputStream());
+        writer = new TagWriter(conn.getOutputStream());
+        User user;
+        String userName = txtUsername.getText();
+        String userPassword = txtPassword.getText();
         Boolean flag;
-        if (!userName.isEmpty() && !userPassword.isEmpty())
-        {
-            
-            
-            String Login_info="<"+userName+" "+userPassword+" "+getPublicIP()+">";
-            String[] request = {Tags.LOGIN,Login_info};
-            
-            System.out.println("login info: "+Login_info);
-            try { 
-               
-          
-            
-                TagValue tv = new TagValue(request[0], request[1].getBytes());                
+        if (!userName.isEmpty() && !userPassword.isEmpty()) {
+
+            String Login_info = "<" + userName + " " + userPassword + " " + getPublicIP() + ">";
+            String[] request = {Tags.LOGIN, Login_info};
+
+            System.out.println("login info: " + Login_info);
+            try {
+
+                TagValue tv = new TagValue(request[0], request[1].getBytes());
                 writer.writeTag(tv);
-                writer.flush();                
-                tv= reader.getTagValue();                                
+                writer.flush();
+                tv = reader.getTagValue(); 
                 System.out.println(tv.getTag());
-                if(tv.getTag().equals(Tags.SUCCESS))
-                {                    
-                    System.out.println("Log in success");                     
-                    List<User> friendList=ImportListFriends(userName);
-//                     System.out.println("what: "+ friendList.get(0).getUser_name());
+                if (tv.getTag().equals(Tags.SUCCESS)) {
+                    System.out.println("Log in success");
+                    List<User> friendList = ImportListFriends(userName);
+//                   System.out.println("what: "+ friendList.get(0).getUser_name());
                     dispose();
-                    new ChatMainForm(userName,friendList).setVisible(true);                                                                                            
-                
-                                    
+                    JFrame chat =  new ChatMainForm(new String(tv.getContent()),friendList);
+                    //System.out.println( new String(tv.getContent()));
+                    chat.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Wrong Username or Password");
                 }
-            else
-            {
-                JOptionPane.showMessageDialog(this,"Wrong Username or Password");
+            } catch (Exception e) {
+                //System.err.println("Network error");
+                e.printStackTrace();
             }
-            }            
-            catch (Exception e) {
-               System.err.println("Network error");
-           }
-                                     
-        }
-        else {
-            JOptionPane.showMessageDialog(this,"You must fill all the blanks!!!");
+
+        } else {
+            JOptionPane.showMessageDialog(this, "You must fill all the blanks!!!");
         }
     }
     private void ckbPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ckbPasswordActionPerformed
-        if(ckbPassword.isSelected()){
-            txtPassword.setEchoChar((char)0);
-        }
-        else
-        {
+        if (ckbPassword.isSelected()) {
+            txtPassword.setEchoChar((char) 0);
+        } else {
             txtPassword.setEchoChar('*');
         }
 
@@ -295,24 +290,28 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton1KeyPressed
-        if(evt.getKeyCode()== KeyEvent.VK_TAB)
+        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
             jButton2.requestFocus();
-        
+        }
+
     }//GEN-LAST:event_jButton1KeyPressed
 
     private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
-        if(evt.getKeyChar() == KeyEvent.VK_TAB)
-            txtPassword.requestFocus();      
+        if (evt.getKeyChar() == KeyEvent.VK_TAB) {
+            txtPassword.requestFocus();
+        }
     }//GEN-LAST:event_txtUsernameKeyPressed
 
     private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
-        if(evt.getKeyCode()== KeyEvent.VK_TAB)
+        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
             jButton1.requestFocus();
+        }
     }//GEN-LAST:event_txtPasswordKeyPressed
 
     private void jButton2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton2KeyPressed
-        if(evt.getKeyCode()== KeyEvent.VK_TAB)
+        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
             txtUsername.requestFocus();
+        }
     }//GEN-LAST:event_jButton2KeyPressed
 
     /**
@@ -349,14 +348,15 @@ public class LoginForm extends javax.swing.JFrame {
             }
         });
     }
-    private void turnoffTabTraversal(){
+
+    private void turnoffTabTraversal() {
         jButton1.setFocusTraversalKeysEnabled(false);
         jButton2.setFocusTraversalKeysEnabled(false);
         txtUsername.setFocusTraversalKeysEnabled(false);
         txtPassword.setFocusTraversalKeysEnabled(false);
     }
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ckbPassword;
     private javax.swing.JButton jButton1;
@@ -376,27 +376,26 @@ public class LoginForm extends javax.swing.JFrame {
     }
 
     private java.util.List<User> ImportListFriends(String username) {
-       String[] request = {Tags.FIND_FRIEND, "<trung>"};
-       String[] askF={Tags.FIND_FRIEND,"<"+username+">"};
-       List<User> users=null;
+        String[] request = {Tags.FIND_FRIEND, "<trung>"};
+        String[] askF = {Tags.FIND_FRIEND, "<" + username + ">"};
+        List<User> users = null;
         try {
-            
-                conn= new Socket(InetAddress.getLocalHost(),9000);
-                reader=new TagReader(conn.getInputStream());
-                writer=new TagWriter(conn.getOutputStream());
-                TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
-                writer.writeTag(tv2);
-                writer.flush();
-                tv2=reader.getTagValue();
+
+            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            reader = new TagReader(conn.getInputStream());
+            writer = new TagWriter(conn.getOutputStream());
+            TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
+            writer.writeTag(tv2);
+            writer.flush();
+            tv2 = reader.getTagValue();
 //                System.out.println("ask: "+ tv2.getTag());
-                if(tv2.getTag().equals(Tags.SUCCESS))
-                {
-                   users = getUsers(tv2.getContent());
-                    for (User usr : users){
+            if (tv2.getTag().equals(Tags.SUCCESS)) {
+                users = getUsers(tv2.getContent());
+                for (User usr : users) {
 //                        System.out.println("get this: "+usr.getUser_name());
-                    }
                 }
-            
+            }
+
         } catch (Exception e) {
             System.err.println("Network error");
         }
