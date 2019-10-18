@@ -211,7 +211,9 @@ public class LoginForm extends javax.swing.JFrame {
 //            cnn.close();
             if(new String("Bao").equals(userName) && new String("123456").equals(userPassword) ){
                 dispose();
-                new ChatMainForm(userName).setVisible(true);
+                ChatMainForm main =  new ChatMainForm(userName);
+                main.setDefaultCloseOperation(0);
+                main.setVisible(true);
             }
             else
             {

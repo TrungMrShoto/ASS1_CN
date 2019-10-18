@@ -344,6 +344,7 @@ setIcon();
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 JFrame menu = new ChatMainForm(Accountid);
+                menu.setDefaultCloseOperation(0);
                 menu.setVisible(true);
             }
         });
@@ -352,7 +353,7 @@ setIcon();
         String[] name={"Lulu","Relu","Closure","a","g","ag","wgaw,","wgawa","gawgwa","gawgwa","gawgwa","gawgaw","gawgwa","gawgwa","gawgwag,","awgwa","gawegaw123123"};
         boolean[] onl={true,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true};
         
-//        jPanel1.setLayout( new FlowLayout() );
+//      jPanel1.setLayout( new FlowLayout() );
         int i=0;
         int co_x=10;
         int co_y=50*i;
