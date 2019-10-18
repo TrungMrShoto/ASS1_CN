@@ -10,8 +10,8 @@ public class ServerThread extends Thread{
 	private Set<ServerThreadThread> serverTTs = new HashSet<ServerThreadThread>();
 	
 	//Make SocketServer for the peer
-	public ServerThread(String portNumb) throws NumberFormatException, IOException {
-		serverSocket = new ServerSocket(Integer.valueOf(portNumb));
+	public ServerThread(int portNumb) throws NumberFormatException, IOException {
+		serverSocket = new ServerSocket(portNumb);
 	}
 	
 	public void run()
