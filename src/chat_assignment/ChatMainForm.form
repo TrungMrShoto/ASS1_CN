@@ -102,14 +102,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="txtMessage" min="-2" pref="534" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="btnSend" min="-2" pref="106" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnClip" min="-2" pref="91" max="-2" attributes="0"/>
-                  </Group>
-                  <Component id="jScrollPane5" max="32767" attributes="0"/>
+                  <Component id="jScrollPane5" pref="755" max="32767" attributes="0"/>
+                  <Component id="txtMessage" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -128,11 +122,7 @@
                   <Group type="102" attributes="0">
                       <Component id="jScrollPane5" pref="552" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="btnSend" alignment="1" max="32767" attributes="0"/>
-                          <Component id="txtMessage" alignment="1" pref="36" max="32767" attributes="0"/>
-                          <Component id="btnClip" max="32767" attributes="0"/>
-                      </Group>
+                      <Component id="txtMessage" min="-2" pref="36" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -233,20 +223,6 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="btnSend">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/chat_assignment/res/iconfinder_send-01_186386.png"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="btnClip">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/chat_assignment/res/iconfinder_clip_115756.png"/>
-        </Property>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="Refresh">
       <Properties>
         <Property name="text" type="java.lang.String" value="Refresh"/>

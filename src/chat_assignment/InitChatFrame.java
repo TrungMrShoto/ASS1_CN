@@ -195,62 +195,62 @@ public class InitChatFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_txtMessageKeyPressed
 
     private void communicate() {
-        try {
-            boolean flag = true;
-            OUTER:
-            while (flag) {
-                String message = buffered.readLine();
-                switch (message) {
-                    case "@e": //thoat chuong trinh
-                        break OUTER;
-                    default:
-                        if (message.isEmpty())
-                            message = " ";
-                        StringWriter stringW = new StringWriter();
-                        stringW.append("@m:<"+this.IP_friend+"><"+this.myIP+">[" + this.MyName + "]:\t" + message);
-                        serverSocket.sendMessage(stringW.toString());
-                        SendMessage(message);
-                        break;
-                }
-            }
-        } catch (Exception e) {
-        }
+//        try {
+//            boolean flag = true;
+//            OUTER:
+//            while (flag) {
+//                String message = buffered.readLine();
+//                switch (message) {
+//                    case "@e": //thoat chuong trinh
+//                        break OUTER;
+//                    default:
+//                        if (message.isEmpty())
+//                            message = " ";
+//                        StringWriter stringW = new StringWriter();
+//                        stringW.append("@m:<"+this.IP_friend+"><"+this.myIP+">[" + this.MyName + "]:\t" + message);
+//                        serverSocket.sendMessage(stringW.toString());
+//                        SendMessage(message);
+//                        break;
+//                }
+//            }
+//        } catch (Exception e) {
+//        }
     }
     private void btnClipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClipActionPerformed
-        BufferedReader bis;
-        JFileChooser choosefile = new JFileChooser("d:");
-        choosefile.setAcceptAllFileFilterUsed(false);
-        choosefile.setDialogTitle("Select file");
-        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
-        choosefile.addChoosableFileFilter(restrict);
-        int conditionOfChooseFile = choosefile.showOpenDialog(null);
-        if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
-            File file = new File(choosefile.getSelectedFile().getAbsolutePath());
-            if (file.length() <= 5242880) {
-                try {
-                    //byte[] myarray = new byte[(int) file.length()];
-                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-                    StringWriter stringW = new StringWriter();
-                    stringW.append("@f:<"+this.IP_friend+"><"+this.myIP+"><" + this.MyName + "><" + file.getName() + ">");
-                    int n;
-                    char[] buff = new char[1024];
-                    while ((n = bis.read(buff)) != -1) {
-                        stringW.write(buff, 0, n);
-                    }
-                    serverSocket.sendMessage(stringW.toString());
-                    //txtMesslog.setText(txtMesslog.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
-            }
-        }
-        txtMessage.setText("");
+//        BufferedReader bis;
+//        JFileChooser choosefile = new JFileChooser("d:");
+//        choosefile.setAcceptAllFileFilterUsed(false);
+//        choosefile.setDialogTitle("Select file");
+//        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+//        choosefile.addChoosableFileFilter(restrict);
+//        int conditionOfChooseFile = choosefile.showOpenDialog(null);
+//        if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+//            File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+//            if (file.length() <= 5242880) {
+//                try {
+//                    //byte[] myarray = new byte[(int) file.length()];
+//                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+//                    StringWriter stringW = new StringWriter();
+//                    stringW.append("@f:<"+this.IP_friend+"><"+this.myIP+"><" + this.MyName + "><" + file.getName() + ">");
+//                    int n;
+//                    char[] buff = new char[1024];
+//                    while ((n = bis.read(buff)) != -1) {
+//                        stringW.write(buff, 0, n);
+//                    }
+//                    serverSocket.sendMessage(stringW.toString());
+//                    //txtMesslog.setText(txtMesslog.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+//                } catch (FileNotFoundException ex) {
+//                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (UnsupportedEncodingException ex) {
+//                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (IOException ex) {
+//                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+//            }
+//        }
+//        txtMessage.setText("");
     }//GEN-LAST:event_btnClipActionPerformed
 
     /**
@@ -282,20 +282,20 @@ public class InitChatFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                
-                try {
-                    JFrame chatFrame = new InitChatFrame("",serverSocket,IP_friend,Friend_name,myIP,MyName);
-                    chatFrame.setVisible(true);
-                } catch (IOException ex) {
-                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                //chatFrame.setTitle(title);
-                
-                
-            }
-        });
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                
+//                try {
+//                    JFrame chatFrame = new InitChatFrame("",serverSocket,IP_friend,Friend_name,myIP,MyName);
+//                    chatFrame.setVisible(true);
+//                } catch (IOException ex) {
+//                    Logger.getLogger(InitChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                //chatFrame.setTitle(title);
+//                
+//                
+//            }
+//        });
     }
     private void SendMessage(String input) {
         //String input = txtMessage.getText();

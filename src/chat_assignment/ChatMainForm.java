@@ -86,7 +86,7 @@ public class ChatMainForm extends JFrame {
         initComponents();
         //AttributeSetup();
         makeServerListening(); // make Server for listening
-        this.getRootPane().setDefaultButton(btnSend);
+        // this.getRootPane().setDefaultButton(btnSend);
         //setTabValue_Friends();
         //JOptionPane.showMessageDialog(this,"Welcome" + Accountid);
         
@@ -118,8 +118,6 @@ public class ChatMainForm extends JFrame {
         jPanel6 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
-        btnSend = new javax.swing.JButton();
-        btnClip = new javax.swing.JButton();
         Refresh = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         txtMessLog = new javax.swing.JTextArea();
@@ -178,10 +176,6 @@ public class ChatMainForm extends JFrame {
         jScrollPane4.setViewportView(jPanel2);
 
         jTabbedPane2.addTab("Group", jScrollPane4);
-
-        btnSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_send-01_186386.png"))); // NOI18N
-
-        btnClip.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_clip_115756.png"))); // NOI18N
 
         Refresh.setText("Refresh");
         Refresh.addActionListener(new java.awt.event.ActionListener() {
@@ -264,13 +258,8 @@ public class ChatMainForm extends JFrame {
                     .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 534, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClip, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane5))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
+                    .addComponent(txtMessage))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -285,10 +274,7 @@ public class ChatMainForm extends JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnSend, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtMessage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                            .addComponent(btnClip, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -697,8 +683,6 @@ public class ChatMainForm extends JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Refresh;
-    private javax.swing.JButton btnClip;
-    private javax.swing.JButton btnSend;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
