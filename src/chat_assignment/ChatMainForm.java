@@ -23,6 +23,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -33,11 +35,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.Document;
 import sun.security.x509.IPAddressName;
 
@@ -84,6 +89,7 @@ public class ChatMainForm extends JFrame {
         this.getRootPane().setDefaultButton(btnSend);
         //setTabValue_Friends();
         //JOptionPane.showMessageDialog(this,"Welcome" + Accountid);
+        
 
         // Logout as closing window
         this.addWindowListener(new WindowAdapter() {
@@ -114,9 +120,9 @@ public class ChatMainForm extends JFrame {
         jPanel2 = new javax.swing.JPanel();
         btnSend = new javax.swing.JButton();
         btnClip = new javax.swing.JButton();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        txtMessLog = new javax.swing.JTextArea();
         Refresh = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtMessLog = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -177,16 +183,16 @@ public class ChatMainForm extends JFrame {
 
         btnClip.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_clip_115756.png"))); // NOI18N
 
-        txtMessLog.setColumns(20);
-        txtMessLog.setRows(5);
-        jScrollPane3.setViewportView(txtMessLog);
-
         Refresh.setText("Refresh");
         Refresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 RefreshActionPerformed(evt);
             }
         });
+
+        txtMessLog.setColumns(20);
+        txtMessLog.setRows(5);
+        jScrollPane5.setViewportView(txtMessLog);
 
         jMenu1.setText("File");
 
@@ -258,13 +264,13 @@ public class ChatMainForm extends JFrame {
                     .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 534, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSend, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClip, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnClip, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane5))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -277,8 +283,8 @@ public class ChatMainForm extends JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnSend, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtMessage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
@@ -320,13 +326,19 @@ public class ChatMainForm extends JFrame {
         } else {
             UserFriendsList = null;
         }
-        txtChat.clear();
+        //txtMessLog.setText("");
         listOfFriendButton.clear();
         listOfPeerList.clear();
         FriendStatus.clear();
         jPanel1.removeAll();
         
         AttributeSetup();
+        if (txtChat.size() == 0) {
+            for (int i = 0; i < UserFriendsList.size(); i++) {
+                JTextArea pane = new JTextArea();
+                txtChat.add(pane);
+            }
+        }
         try {
             setTabValue_Friends();
             //jPanel1.setVisible(true);
@@ -422,6 +434,16 @@ public class ChatMainForm extends JFrame {
 
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        try {
+                            SendMessage(listOfFriendButton.indexOf(btn));
+                        } catch (IOException ex) {
+                            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                txtMessLog.updateUI();
+                            }
+                        });
                         //final_sendUser = "xxx";
                         for (int i = 0; i < listOfFriendButton.size(); i++) {
                             if (listOfFriendButton.get(i) != btn) {
@@ -430,14 +452,10 @@ public class ChatMainForm extends JFrame {
                             }
                             
                         }
-                        //txtMesslog.setText("");
+                        //txtMessLog.setText("");
                         btn.setBackground(Color.cyan);
-                        try {
-                            SendMessage(listOfFriendButton.indexOf(btn));
-                            //System.out.println("From: " + temp);
-                        } catch (IOException ex) {
-                            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        
+                        
                     }
 
                 });
@@ -455,7 +473,7 @@ public class ChatMainForm extends JFrame {
                         
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
                         socket = new Socket("localhost", UserFriendsList.get(i).getID() + 9000);
-                        PeerThread peer = new PeerThread(socket);
+                        PeerThread peer = new PeerThread(socket,txtChat.get(i),txtMessLog);
                         listOfPeerList.add(peer);
                         peer.start();
                     } catch (IOException | NumberFormatException e) {
@@ -466,8 +484,12 @@ public class ChatMainForm extends JFrame {
                         }
                     
                     }
-                    JTextArea pane = new JTextArea();
-                    txtChat.add(pane);
+//                    if (txtChat.get(i)==null){
+//                        JTextArea pane = new JTextArea();
+//                        txtChat.add(pane);
+//                    }
+                    
+                    
                 } else {
                     JLabel onl_icon = new JLabel();
                     onl_icon.setText("");
@@ -475,7 +497,7 @@ public class ChatMainForm extends JFrame {
                     onl_icon.setBounds(co_x + 220 + 8, co_y, panel_weight, panel_height);
                     jPanel1.add(onl_icon);
                     listOfPeerList.add(null);
-                    txtChat.add(null);
+                    //txtChat.get(i) = null;
                 }
                 btn.setText(name.get(i));
                 jPanel1.add(btn);
@@ -551,68 +573,58 @@ public class ChatMainForm extends JFrame {
     }
 
     private void SendMessage(int i) throws IOException {
-        if (txtChat.get(i)==null)
-        {
+        if (UserFriendsList.get(i).getStatus() == 0) {
             JOptionPane.showMessageDialog(null, "Your friend isn't online");
-            return;}
-        BufferedReader buffer=new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+            return;
+        }
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        BufferedReader bis;
         String input;
-        //while (true) {
-            input = buffer.readLine();
-            //String input = txtMessage.getText();
-            String sender = Accountid;
-            //Color color = Color.BLUE;
-            StringWriter stringW = new StringWriter();
-            stringW.append("@a:<" + UserFriendsList.get(i).getIP_addr() + "><" + UserInformation[2] + ">[" + UserInformation[1] + "]:" + input);
-            serverThread.sendMessage(stringW.toString());
-            //Append_Message(i, sender, input);
-            if (input!=null){
-                txtChat.get(i).append("[___________________]:"+input+"\n");
-                txtMessLog.setText(txtChat.get(i).getText());
-                System.out.println(txtChat.get(i).getText());
-                txtMessLog.updateUI();
-            
-            //txtMesslog.setDocument(txtChat.get(i).getDocument());
-            //txtMesslog = txtChat.get(i);
-            //txtMesslog.setEditable(false);
-                txtMessage.setText("");
+        input = buffer.readLine();
+        if (input.length()<3 && input.contains("@f")) {
+            JFileChooser choosefile = new JFileChooser("d:");
+            choosefile.setAcceptAllFileFilterUsed(false);
+            choosefile.setDialogTitle("Select file");
+            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+            choosefile.addChoosableFileFilter(restrict);
+            int conditionOfChooseFile = choosefile.showOpenDialog(null);
+            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+                if (file.length() <= 5242880) {
+                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                    StringWriter stringW = new StringWriter();
+                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><"+file.getName()+">");
+                    int n;
+                    char[] buff = new char[1024];
+                    while ((n = bis.read(buff)) != -1) {
+                        stringW.write(buff, 0, n);
+                    }
+                    serverThread.sendMessage(stringW.toString());
+                    printMessage(i,"You sent the file (" + file.getPath() + ") to your friend!!!");
+                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+                }
             }
-        //}
-    }
-
-    private void Append_Message(int i, String header, String content) {
-        if (!content.isEmpty()) {
-            Mess_header(i, header);
-            Mess_content(i, content);
+            txtMessage.setText("");
+            
+        } else {
+            StringWriter stringW = new StringWriter();
+            stringW.append("@a:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + ">[" + UserInformation[1] + "]:" + input);
+            serverThread.sendMessage(stringW.toString());
+            if (input != null) {
+                printMessage(i,input);
+            }
         }
     }
-
-    private void Mess_header(int i, String header) {
-//        if (!header.equals(final_sendUser)) {
-//            int len = txtChat.get(i).getDocument().getLength();
-//            txtChat.get(i).setCaretPosition(len);
-//            txtChat.get(i).setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 13), false);
-//            txtChat.get(i).replaceSelection(header + ":");
-//        } else {
-//            int len = txtChat.get(i).getDocument().getLength();
-//            txtChat.get(i).setCaretPosition(len);
-//            txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.MAGENTA, "San Francisco", 13), false);
-//            for (int j = 0; j < header.length() + 3; j++) {
-//                txtChat.get(i).replaceSelection(" ");
-//            }
-//        }
-//        final_sendUser = header;
-            
+    private void printMessage(int i, String message)
+    {
+        txtChat.get(i).append("[___________________]:"+message + "\n");
+        txtMessLog.setText(txtChat.get(i).getText());
+        //txtMessLog.updateUI();
+        txtMessage.setText("");
     }
-
-    private void Mess_content(int i, String content) {
-//        int len = txtChat.get(i).getDocument().getLength();
-//        txtChat.get(i).setCaretPosition(len);
-//        txtChat.get(i).MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false);
-//        txtChat.get(i).replaceSelection(content + "\n");
-          txtChat.get(i).setText(content+"\n");
-    }
-     private java.util.List<User> ImportListFriends() {
+    private java.util.List<User> ImportListFriends() {
         //String[] request = {Tags.FIND_FRIEND, "<trung>"};
         String[] askF = {Tags.FIND_FRIEND, "<" + UserInformation[1] + ">"};
         List<User> users = null;
@@ -700,8 +712,8 @@ public class ChatMainForm extends JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextArea txtMessLog;
     private javax.swing.JTextField txtMessage;
