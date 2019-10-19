@@ -22,8 +22,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.text.Document;
 import sun.security.x509.IPAddressName;
 
 /**
@@ -42,8 +46,6 @@ import sun.security.x509.IPAddressName;
  * @author Meep
  */
 public class ChatMainForm extends JFrame {
-
-    private Socket conn;
     private TagReader reader;
     private TagWriter writer;
     List<JButton> listOfFriendButton = new ArrayList<>();
@@ -52,11 +54,13 @@ public class ChatMainForm extends JFrame {
     private ServerThread serverThread;
     private static int numOFriend = 0;
     private static String Accountid = "Sub";
-    private static List<String> Friendslist = new ArrayList<String>();
-    private static List<Integer> FriendStatus = new ArrayList<>();
-    private static List<User> UserFriendsList;
+    private List<String> Friendslist = new ArrayList<String>();
+    private List<Integer> FriendStatus = new ArrayList<>();
+    private List<JTextArea> txtChat = new ArrayList<>();
+    private List<User> UserFriendsList;
     private static String final_sendUser = "xx";
     private String[] UserInformation;
+    
 
     /**
      * Creates new form ChatMainForm
@@ -66,21 +70,16 @@ public class ChatMainForm extends JFrame {
      * @param friendList
      * @throws java.io.IOException
      */
-    public ChatMainForm(String userInfor, List<User> friendList) throws IOException {
+    public ChatMainForm(String userInfor) throws IOException {
         userInfor = userInfor.substring(1, userInfor.length() - 1);
         UserInformation = userInfor.split(" ");
         PortNumber = Integer.valueOf(UserInformation[0]) + 9000;
         setIcon();
         Accountid = UserInformation[1];
-        if (friendList != null) {
-            UserFriendsList = friendList;
-//            System.out.println("what: "+ friendList.get(0).getUser_name());
-        } else {
-            UserFriendsList = null;
-        }
+        
         this.setTitle("Welcome " + UserInformation[1]);
         initComponents();
-        AttributeSetup();
+        //AttributeSetup();
         makeServerListening(); // make Server for listening
         this.getRootPane().setDefaultButton(btnSend);
         //setTabValue_Friends();
@@ -116,7 +115,7 @@ public class ChatMainForm extends JFrame {
         btnSend = new javax.swing.JButton();
         btnClip = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        txtMesslog = new javax.swing.JTextPane();
+        txtMessLog = new javax.swing.JTextArea();
         Refresh = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -128,12 +127,6 @@ public class ChatMainForm extends JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        txtMessage.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtMessageKeyPressed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -184,10 +177,11 @@ public class ChatMainForm extends JFrame {
 
         btnClip.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_clip_115756.png"))); // NOI18N
 
-        jScrollPane3.setViewportView(txtMesslog);
+        txtMessLog.setColumns(20);
+        txtMessLog.setRows(5);
+        jScrollPane3.setViewportView(txtMessLog);
 
         Refresh.setText("Refresh");
-        Refresh.setActionCommand("Refresh");
         Refresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 RefreshActionPerformed(evt);
@@ -317,19 +311,29 @@ public class ChatMainForm extends JFrame {
         JOptionPane.showMessageDialog(null, "If you want to support us, please contact at our email!!!");
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
-    private void txtMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMessageKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            System.out.println("Ues");
-            SendMessage();
-        }
-    }//GEN-LAST:event_txtMessageKeyPressed
-
     private void RefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefreshActionPerformed
+        List<User> friendList = ImportListFriends();
+        
+        if (friendList != null) {
+            UserFriendsList = friendList;
+//            System.out.println("what: "+ friendList.get(0).getUser_name());
+        } else {
+            UserFriendsList = null;
+        }
+        txtChat.clear();
+        listOfFriendButton.clear();
+        listOfPeerList.clear();
+        FriendStatus.clear();
+        jPanel1.removeAll();
+        
+        AttributeSetup();
         try {
             setTabValue_Friends();
+            //jPanel1.setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
+        jPanel1.updateUI();
     }//GEN-LAST:event_RefreshActionPerformed
 
     /**
@@ -364,9 +368,11 @@ public class ChatMainForm extends JFrame {
             @Override
             public void run() {
                 try {
-                    JFrame menu = new ChatMainForm(Accountid, UserFriendsList);
+                    JFrame menu = new ChatMainForm(Accountid);
                     menu.setTitle("Chat Room");
+                    menu.setDefaultCloseOperation(0);
                     menu.setVisible(true);
+                    
 
                 } catch (IOException ex) {
                     Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -387,8 +393,7 @@ public class ChatMainForm extends JFrame {
             if (FriendStatus != null) {
                 online = FriendStatus;
             }
-            listOfFriendButton.clear();
-            listOfPeerList.clear();
+            
 //          jPanel1.setLayout( new FlowLayout() );
             int i = 0;
             int co_x = 10;
@@ -396,6 +401,7 @@ public class ChatMainForm extends JFrame {
             int panel_weight = 220;
             int panel_height = 50;
             numOFriend = name.size();
+            
             //display friend in tab
             for (i = 0; i < name.size(); i++) {
                 co_y = 50 * i;
@@ -409,28 +415,29 @@ public class ChatMainForm extends JFrame {
 //             btn.setOnAction(new EventHandler<ActionEvent>() {
 //        @Override public void handle(ActionEvent actionEvent) {
 //            System.out.println("from: "+temp);
+                
 //        }
 //    });
                 btn.addActionListener(new java.awt.event.ActionListener() {
-//                  boolean init=true;
-                    //String title = temp.replace("JButton_", "");
-                    //JFrame jf = new JFrame("Chat: " + title);
-                    //InitChatFrame checkthis = new InitChatFrame(title, serverThread,IP_address,username,myIP,Accountid);
 
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                      init=InitNewChatJFrame(init);                                
-                        //checkthis.setVisible(true);
-
-                        final_sendUser = "xxx";
+                        //final_sendUser = "xxx";
                         for (int i = 0; i < listOfFriendButton.size(); i++) {
                             if (listOfFriendButton.get(i) != btn) {
                                 listOfFriendButton.get(i).setBackground(new JButton().getBackground());
+                                //SendMessage(i);
                             }
+                            
                         }
-                        txtMesslog.setText("");
+                        //txtMesslog.setText("");
                         btn.setBackground(Color.cyan);
-                        System.out.println("From: " + temp);
+                        try {
+                            SendMessage(listOfFriendButton.indexOf(btn));
+                            //System.out.println("From: " + temp);
+                        } catch (IOException ex) {
+                            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
 
                 });
@@ -445,23 +452,30 @@ public class ChatMainForm extends JFrame {
                     try {
                         //System.out.println(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName());
                         System.out.println(UserFriendsList.get(i).getID() + 9000);
+                        
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
                         socket = new Socket("localhost", UserFriendsList.get(i).getID() + 9000);
-                        new PeerThread(socket).start();
+                        PeerThread peer = new PeerThread(socket);
+                        listOfPeerList.add(peer);
+                        peer.start();
                     } catch (IOException | NumberFormatException e) {
                         if (socket != null) {
                             socket.close();
                         } else {
-                            JOptionPane.showMessageDialog(this, "invalid input");
-                            System.exit(0);
+                            //JOptionPane.showMessageDialog(this, "invalid input");
                         }
+                    
                     }
+                    JTextArea pane = new JTextArea();
+                    txtChat.add(pane);
                 } else {
                     JLabel onl_icon = new JLabel();
                     onl_icon.setText("");
                     onl_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_b_4_2578285.png")));
                     onl_icon.setBounds(co_x + 220 + 8, co_y, panel_weight, panel_height);
                     jPanel1.add(onl_icon);
+                    listOfPeerList.add(null);
+                    txtChat.add(null);
                 }
                 btn.setText(name.get(i));
                 jPanel1.add(btn);
@@ -505,36 +519,7 @@ public class ChatMainForm extends JFrame {
 
     }
 
-    private void Append_Message(String header, String content, Color headCol) {
-        if (!content.isEmpty()) {
-            Mess_header(header, headCol);
-            Mess_content(content);
-        }
-    }
-
-    private void Mess_header(String header, Color color) {
-        if (!header.equals(final_sendUser)) {
-            int len = txtMesslog.getDocument().getLength();
-            txtMesslog.setCaretPosition(len);
-            txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 13), false);
-            txtMesslog.replaceSelection(header + ":");
-        } else {
-            int len = txtMesslog.getDocument().getLength();
-            txtMesslog.setCaretPosition(len);
-            txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.MAGENTA, "San Francisco", 13), false);
-            for (int i = 0; i < header.length() + 3; i++) {
-                txtMesslog.replaceSelection(" ");
-            }
-        }
-        final_sendUser = header;
-    }
-
-    private void Mess_content(String content) {
-        int len = txtMesslog.getDocument().getLength();
-        txtMesslog.setCaretPosition(len);
-        txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false);
-        txtMesslog.replaceSelection(content + "\n");
-    }
+    
 
     private void setIcon() {
 
@@ -565,19 +550,117 @@ public class ChatMainForm extends JFrame {
         return systemipaddress;
     }
 
-    private void SendMessage() {
-        String input = txtMessage.getText();
-        String sender = Accountid;
-        Color color = Color.BLUE;
-        Append_Message(sender, input, color);
-        txtMessage.setText("");
+    private void SendMessage(int i) throws IOException {
+        if (txtChat.get(i)==null)
+        {
+            JOptionPane.showMessageDialog(null, "Your friend isn't online");
+            return;}
+        BufferedReader buffer=new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        String input;
+        //while (true) {
+            input = buffer.readLine();
+            //String input = txtMessage.getText();
+            String sender = Accountid;
+            //Color color = Color.BLUE;
+            StringWriter stringW = new StringWriter();
+            stringW.append("@a:<" + UserFriendsList.get(i).getIP_addr() + "><" + UserInformation[2] + ">[" + UserInformation[1] + "]:" + input);
+            serverThread.sendMessage(stringW.toString());
+            //Append_Message(i, sender, input);
+            if (input!=null){
+                txtChat.get(i).append("[___________________]:"+input+"\n");
+                txtMessLog.setText(txtChat.get(i).getText());
+                System.out.println(txtChat.get(i).getText());
+                txtMessLog.updateUI();
+            
+            //txtMesslog.setDocument(txtChat.get(i).getDocument());
+            //txtMesslog = txtChat.get(i);
+            //txtMesslog.setEditable(false);
+                txtMessage.setText("");
+            }
+        //}
     }
 
+    private void Append_Message(int i, String header, String content) {
+        if (!content.isEmpty()) {
+            Mess_header(i, header);
+            Mess_content(i, content);
+        }
+    }
+
+    private void Mess_header(int i, String header) {
+//        if (!header.equals(final_sendUser)) {
+//            int len = txtChat.get(i).getDocument().getLength();
+//            txtChat.get(i).setCaretPosition(len);
+//            txtChat.get(i).setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 13), false);
+//            txtChat.get(i).replaceSelection(header + ":");
+//        } else {
+//            int len = txtChat.get(i).getDocument().getLength();
+//            txtChat.get(i).setCaretPosition(len);
+//            txtMesslog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.MAGENTA, "San Francisco", 13), false);
+//            for (int j = 0; j < header.length() + 3; j++) {
+//                txtChat.get(i).replaceSelection(" ");
+//            }
+//        }
+//        final_sendUser = header;
+            
+    }
+
+    private void Mess_content(int i, String content) {
+//        int len = txtChat.get(i).getDocument().getLength();
+//        txtChat.get(i).setCaretPosition(len);
+//        txtChat.get(i).MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false);
+//        txtChat.get(i).replaceSelection(content + "\n");
+          txtChat.get(i).setText(content+"\n");
+    }
+     private java.util.List<User> ImportListFriends() {
+        //String[] request = {Tags.FIND_FRIEND, "<trung>"};
+        String[] askF = {Tags.FIND_FRIEND, "<" + UserInformation[1] + ">"};
+        List<User> users = null;
+        try {
+
+            Socket conn = new Socket(InetAddress.getLocalHost(), 9000);
+            reader = new TagReader(conn.getInputStream());
+            writer = new TagWriter(conn.getOutputStream());
+            TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
+            writer.writeTag(tv2);
+            writer.flush();
+            tv2 = reader.getTagValue();
+//                System.out.println("ask: "+ tv2.getTag());
+            
+            if (tv2.getTag().equals(Tags.SUCCESS)) {
+                users = getUsers(tv2.getContent());
+                for (User usr : users) {
+                        System.out.println("get this: "+usr.getUser_name());
+                }
+            }
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Network error");
+        }
+        return users;
+    }
+    
+     private java.util.List<User> getUsers(byte[] content) {
+        String string = new String(content);
+        string = string.replace("<", "");
+        string = string.replace(">", "");
+
+        String[] arrString = string.split("\\|");
+        java.util.List<User> users = new ArrayList<>();
+
+        for (String str : arrString) {
+            String[] arrAttr = str.split(" ");
+            users.add(new User(Integer.parseInt(arrAttr[0]), arrAttr[1], arrAttr[2], Integer.parseInt(arrAttr[3])));
+        }
+        return users;
+    }
+    
+    
     private void LogoutPerformed(java.awt.event.ActionEvent evt) {
-        int confirm = JOptionPane.showConfirmDialog(null, "Logout?");
-        if (confirm == 0) {
+        int confirm = JOptionPane.showConfirmDialog(this, "Logout?");
+        //if (confirm == 0) {
             try {
-                conn = new Socket(InetAddress.getLocalHost(), 9000);
+                Socket conn = new Socket(InetAddress.getLocalHost(), 9000);
                 reader = new TagReader(conn.getInputStream());
                 writer = new TagWriter(conn.getOutputStream());
                 String[] request = {Tags.LOGOUT, "<" + Accountid + ">"};
@@ -586,15 +669,19 @@ public class ChatMainForm extends JFrame {
                 writer.writeTag(tv);
                 writer.flush();
                 tv = reader.getTagValue();
-                if (tv.getTag().equals(Tags.SUCCESS)) {
-                    this.setVisible(false);
-                    LoginForm Login = new LoginForm();
-                    Login.setVisible(true);
-                }
+//                if (tv.getTag().equals(Tags.SUCCESS)) {
+//                    this.setVisible(false);
+//                    LoginForm Login = new LoginForm();
+//                    Login.setVisible(true);
+//                }
+                conn.close();
             } catch (Exception e) {
 
             }
-        }
+        //}
+        System.exit(0);
+        //else 
+        //    System.exit(0);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Refresh;
@@ -616,7 +703,7 @@ public class ChatMainForm extends JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTextArea txtMessLog;
     private javax.swing.JTextField txtMessage;
-    private javax.swing.JTextPane txtMesslog;
     // End of variables declaration//GEN-END:variables
 }
