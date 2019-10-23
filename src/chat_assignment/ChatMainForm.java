@@ -54,7 +54,6 @@ import sun.security.x509.IPAddressName;
  * @author Meep
  */
 public class ChatMainForm extends JFrame {
-
     private String IP_host = "10.28.3.87";
     private Socket conn;
     private TagReader reader;
