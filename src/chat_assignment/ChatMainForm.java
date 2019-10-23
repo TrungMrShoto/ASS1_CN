@@ -55,6 +55,7 @@ import sun.security.x509.IPAddressName;
  */
 public class ChatMainForm extends JFrame {
 
+    private String IP_host = "10.28.3.87";
     private Socket conn;
     private TagReader reader;
     private TagWriter writer;
@@ -537,7 +538,7 @@ public class ChatMainForm extends JFrame {
                         System.out.println(UserFriendsList.get(i).getID() + 9000);
 
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
-                        socket = new Socket("localhost", UserFriendsList.get(i).getID() + 9000);
+                        socket = new Socket(UserFriendsList.get(i).getIP_addr(), UserFriendsList.get(i).getID() + 9000);
                         PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog);
                         listOfPeerList.add(peer);
                         peer.start();
@@ -572,7 +573,7 @@ public class ChatMainForm extends JFrame {
 
     private void setTabValue_Requests() throws UnknownHostException, IOException {
         RequestPanel.removeAll();
-        conn = new Socket(InetAddress.getLocalHost(), 9000);
+        conn = new Socket(IP_host, 9000);
         reader = new TagReader(conn.getInputStream());
         writer = new TagWriter(conn.getOutputStream());
         RequestPanel.setLayout(new FlowLayout());
@@ -614,7 +615,7 @@ public class ChatMainForm extends JFrame {
                             String content = "<" + RequestName + " " + Accountid + ">";
                             String[] askF = {Tags.ACCEPT, content};
                             try {
-                                conn = new Socket(InetAddress.getLocalHost(), 9000);
+                                conn = new Socket(IP_host, 9000);
                                 reader = new TagReader(conn.getInputStream());
                                 writer = new TagWriter(conn.getOutputStream());
                                 TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -639,7 +640,7 @@ public class ChatMainForm extends JFrame {
                             System.out.println("content: " + content);
                             String[] askF = {Tags.DELETE, content};
                             try {
-                                conn = new Socket(InetAddress.getLocalHost(), 9000);
+                                conn = new Socket(IP_host, 9000);
                                 reader = new TagReader(conn.getInputStream());
                                 writer = new TagWriter(conn.getOutputStream());
                                 TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -868,7 +869,7 @@ public class ChatMainForm extends JFrame {
         List<User> users = null;
         try {
 
-            Socket conn = new Socket(InetAddress.getLocalHost(), 9000);
+            Socket conn = new Socket(IP_host, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -909,7 +910,7 @@ public class ChatMainForm extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this, "Logout?");
         if (confirm == 0) {
             try {
-                Socket conn = new Socket(InetAddress.getLocalHost(), 9000);
+                Socket conn = new Socket(IP_host, 9000);
                 reader = new TagReader(conn.getInputStream());
                 writer = new TagWriter(conn.getOutputStream());
                 String[] request = {Tags.LOGOUT, "<" + Accountid + ">"};
