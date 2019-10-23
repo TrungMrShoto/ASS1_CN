@@ -46,30 +46,30 @@ public class PeerThread extends Thread {
         while (flag) {
             try {
                 message = buffered.readLine();
-
-                header = message.substring(0, 2);
-                message = message.substring(message.indexOf("<"));
-                String ID_ME = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
-                message = message.substring(message.indexOf("<") + ID_ME.length() + 2);
-                String friend_ID = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
-                message = message.substring(message.indexOf("<") + friend_ID.length() + 2);
-                if (header.equals("@f")) {
-                    String friend_name = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
-                    message = message.substring(message.indexOf("<") + 2 + friend_name.length());
-                    String fileName = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
-                    message = message.substring(message.indexOf(">") + 1);
-                    FileWriter file = new FileWriter("d:\\Test\\" + fileName);
-                    PrintWriter writeToFile;
-                    writeToFile = new PrintWriter(file);
-                    writeToFile.print(message);
-                    writeToFile.close();
-
-                    private_chatHistory.append("[" + friend_name + "]:\t I just sent you a file which located in (d:\\" + fileName + ")" + "\n");
-                    public_chatHistory.setText(public_chatHistory.getText());
-                } else {
+//
+//                header = message.substring(0, 2);
+//                message = message.substring(message.indexOf("<"));
+//                String ID_ME = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
+//                message = message.substring(message.indexOf("<") + ID_ME.length() + 2);
+//                String friend_ID = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
+//                message = message.substring(message.indexOf("<") + friend_ID.length() + 2);
+//                if (header.equals("@f")) {
+//                    String friend_name = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
+//                    message = message.substring(message.indexOf("<") + 2 + friend_name.length());
+//                    String fileName = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
+//                    message = message.substring(message.indexOf(">") + 1);
+//                    FileWriter file = new FileWriter("d:\\Test\\" + fileName);
+//                    PrintWriter writeToFile;
+//                    writeToFile = new PrintWriter(file);
+//                    writeToFile.print(message);
+//                    writeToFile.close();
+//
+//                    private_chatHistory.append("[" + friend_name + "]:\t I just sent you a file which located in (d:\\" + fileName + ")" + "\n");
+//                    public_chatHistory.setText(public_chatHistory.getText());
+//                } else {
                     private_chatHistory.append(message + "\n");
                     public_chatHistory.setText(public_chatHistory.getText());
-                }
+//                }
 
             } catch (IOException e) {
                 flag = false;

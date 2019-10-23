@@ -16,6 +16,8 @@ import static java.awt.Font.ITALIC;
 import java.net.Socket;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 
 import java.awt.event.KeyEvent;
@@ -30,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,6 +54,8 @@ import sun.security.x509.IPAddressName;
  * @author Meep
  */
 public class ChatMainForm extends JFrame {
+
+    private Socket conn;
     private TagReader reader;
     private TagWriter writer;
     List<JButton> listOfFriendButton = new ArrayList<>();
@@ -62,10 +67,10 @@ public class ChatMainForm extends JFrame {
     private List<String> Friendslist = new ArrayList<String>();
     private List<Integer> FriendStatus = new ArrayList<>();
     private List<JTextArea> txtChat = new ArrayList<>();
-    private List<User> UserFriendsList;
+    private static List<User> UserFriendsList = new ArrayList<>();
     private static String final_sendUser = "xx";
-    private String[] UserInformation;
-    
+    private String[] UserInformation = {""};
+    private String info = ""; // use to store the param send from LoginForm to ChatMainform, so that it can be past to Search
 
     /**
      * Creates new form ChatMainForm
@@ -75,21 +80,30 @@ public class ChatMainForm extends JFrame {
      * @param friendList
      * @throws java.io.IOException
      */
-    public ChatMainForm(String userInfor) throws IOException {
+    public ChatMainForm(String userInfor, List<User> friendList) throws IOException {
+        resetallVar(); // reset tất cả các biến toan cuc, để từ loginfrom tới chatmainform ko bi loi bi dang nhap 2 tai khoan khac nhau;
+        info = userInfor;
         userInfor = userInfor.substring(1, userInfor.length() - 1);
         UserInformation = userInfor.split(" ");
         PortNumber = Integer.valueOf(UserInformation[0]) + 9000;
         setIcon();
         Accountid = UserInformation[1];
-        
+        System.out.println("User info: " + UserInformation[1]);
+        if (friendList != null) {
+            UserFriendsList = friendList;
+//            System.out.println("what: "+ friendList.get(0).getUser_name());
+        } else {
+            UserFriendsList = null;
+        }
+
         this.setTitle("Welcome " + UserInformation[1]);
         initComponents();
-        //AttributeSetup();
+        AttributeSetup();
         makeServerListening(); // make Server for listening
-        // this.getRootPane().setDefaultButton(btnSend);
-        //setTabValue_Friends();
+//         this.getRootPane().setDefaultButton(btnSend);
+//        setTabValue_Friends();
+//        setTabValue_Requests();
         //JOptionPane.showMessageDialog(this,"Welcome" + Accountid);
-        
 
         // Logout as closing window
         this.addWindowListener(new WindowAdapter() {
@@ -115,12 +129,14 @@ public class ChatMainForm extends JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jPanel6 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
+        RequestPanel = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         Refresh = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         txtMessLog = new javax.swing.JTextArea();
+        Send = new javax.swing.JButton();
+        File = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -130,7 +146,13 @@ public class ChatMainForm extends JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        txtMessage.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtMessageKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -147,18 +169,18 @@ public class ChatMainForm extends JFrame {
 
         jTabbedPane2.addTab("Friends", jScrollPane1);
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout RequestPanelLayout = new javax.swing.GroupLayout(RequestPanel);
+        RequestPanel.setLayout(RequestPanelLayout);
+        RequestPanelLayout.setHorizontalGroup(
+            RequestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 326, Short.MAX_VALUE)
         );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        RequestPanelLayout.setVerticalGroup(
+            RequestPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 637, Short.MAX_VALUE)
         );
 
-        jScrollPane2.setViewportView(jPanel6);
+        jScrollPane2.setViewportView(RequestPanel);
 
         jTabbedPane2.addTab("Request", jScrollPane2);
 
@@ -173,9 +195,9 @@ public class ChatMainForm extends JFrame {
             .addGap(0, 610, Short.MAX_VALUE)
         );
 
-        jScrollPane4.setViewportView(jPanel2);
+        jScrollPane3.setViewportView(jPanel2);
 
-        jTabbedPane2.addTab("Group", jScrollPane4);
+        jTabbedPane2.addTab("Group", jScrollPane3);
 
         Refresh.setText("Refresh");
         Refresh.addActionListener(new java.awt.event.ActionListener() {
@@ -187,6 +209,15 @@ public class ChatMainForm extends JFrame {
         txtMessLog.setColumns(20);
         txtMessLog.setRows(5);
         jScrollPane5.setViewportView(txtMessLog);
+
+        Send.setText("jButton1");
+        Send.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SendActionPerformed(evt);
+            }
+        });
+
+        File.setText("jButton2");
 
         jMenu1.setText("File");
 
@@ -255,11 +286,16 @@ public class ChatMainForm extends JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(Refresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
+                    .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
-                    .addComponent(txtMessage))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 546, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(Send)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(File))
+                    .addComponent(jScrollPane5))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -270,11 +306,14 @@ public class ChatMainForm extends JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(Refresh)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane5)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Send)
+                            .addComponent(File))))
                 .addContainerGap())
         );
 
@@ -283,7 +322,7 @@ public class ChatMainForm extends JFrame {
 
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        SearchForm s = new SearchForm();
+        SearchForm s = new SearchForm(info, UserFriendsList);
         s.setVisible(true);// TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
@@ -305,7 +344,8 @@ public class ChatMainForm extends JFrame {
 
     private void RefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefreshActionPerformed
         List<User> friendList = ImportListFriends();
-        
+        UserFriendsList = ImportListFriends();
+        updateFriendlist();
         if (friendList != null) {
             UserFriendsList = friendList;
 //            System.out.println("what: "+ friendList.get(0).getUser_name());
@@ -317,7 +357,7 @@ public class ChatMainForm extends JFrame {
         listOfPeerList.clear();
         FriendStatus.clear();
         jPanel1.removeAll();
-        
+
         AttributeSetup();
         if (txtChat.size() == 0) {
             for (int i = 0; i < UserFriendsList.size(); i++) {
@@ -327,12 +367,46 @@ public class ChatMainForm extends JFrame {
         }
         try {
             setTabValue_Friends();
+            setTabValue_Requests();
             //jPanel1.setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
         jPanel1.updateUI();
     }//GEN-LAST:event_RefreshActionPerformed
+
+    private void txtMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMessageKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            try {
+                choose_Client();
+            } catch (IOException ex) {
+                Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_txtMessageKeyPressed
+
+    private void SendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendActionPerformed
+        try {
+            choose_Client();
+        } catch (IOException ex) {
+            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_SendActionPerformed
+
+    private void choose_Client() throws IOException {
+        int j = -1;
+        for (int i = 0; i < listOfFriendButton.size(); i++) {
+            if (listOfFriendButton.get(i).getBackground() == Color.cyan) {
+                j = i;
+                break;
+            }
+        }
+        if (j != -1) {
+            SendMessage(j);
+        } else {
+            JOptionPane.showMessageDialog(null, "You must choose your friend first!");
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -366,11 +440,10 @@ public class ChatMainForm extends JFrame {
             @Override
             public void run() {
                 try {
-                    JFrame menu = new ChatMainForm(Accountid);
+                    JFrame menu = new ChatMainForm(Accountid, UserFriendsList);
                     menu.setTitle("Chat Room");
                     menu.setDefaultCloseOperation(0);
                     menu.setVisible(true);
-                    
 
                 } catch (IOException ex) {
                     Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -380,6 +453,11 @@ public class ChatMainForm extends JFrame {
     }
 
     private void setTabValue_Friends() throws IOException {
+        Component[] componentList = jPanel1.getComponents();
+        for (Component c : componentList) {
+            c.setVisible(false);
+        }
+        jPanel1.removeAll();
         List<String> name = new ArrayList<String>();
         if (Friendslist != null) {
             name = Friendslist;
@@ -391,7 +469,8 @@ public class ChatMainForm extends JFrame {
             if (FriendStatus != null) {
                 online = FriendStatus;
             }
-            
+            listOfFriendButton.clear();
+            listOfPeerList.clear();
 //          jPanel1.setLayout( new FlowLayout() );
             int i = 0;
             int co_x = 10;
@@ -399,7 +478,7 @@ public class ChatMainForm extends JFrame {
             int panel_weight = 220;
             int panel_height = 50;
             numOFriend = name.size();
-            
+
             //display friend in tab
             for (i = 0; i < name.size(); i++) {
                 co_y = 50 * i;
@@ -413,35 +492,35 @@ public class ChatMainForm extends JFrame {
 //             btn.setOnAction(new EventHandler<ActionEvent>() {
 //        @Override public void handle(ActionEvent actionEvent) {
 //            System.out.println("from: "+temp);
-                
+
 //        }
 //    });
                 btn.addActionListener(new java.awt.event.ActionListener() {
 
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        try {
-                            SendMessage(listOfFriendButton.indexOf(btn));
-                        } catch (IOException ex) {
-                            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                txtMessLog.updateUI();
-                            }
-                        });
-                        //final_sendUser = "xxx";
                         for (int i = 0; i < listOfFriendButton.size(); i++) {
                             if (listOfFriendButton.get(i) != btn) {
                                 listOfFriendButton.get(i).setBackground(new JButton().getBackground());
-                                //SendMessage(i);
                             }
-                            
                         }
-                        //txtMessLog.setText("");
                         btn.setBackground(Color.cyan);
-                        
-                        
+//                        }
+//                        try {
+//                            SendMessage(listOfFriendButton.indexOf(btn));
+//                        } catch (IOException ex) {
+//                            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
+//                        SwingUtilities.invokeLater(new Runnable() {
+//                            public void run() {
+//                                txtMessLog.updateUI();
+//                            }
+//                        });
+//                        //final_sendUser = "xxx";
+//                        
+//                        //txtMessLog.setText("");
+//                        
+
                     }
 
                 });
@@ -456,10 +535,10 @@ public class ChatMainForm extends JFrame {
                     try {
                         //System.out.println(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName());
                         System.out.println(UserFriendsList.get(i).getID() + 9000);
-                        
+
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
                         socket = new Socket("localhost", UserFriendsList.get(i).getID() + 9000);
-                        PeerThread peer = new PeerThread(socket,txtChat.get(i),txtMessLog);
+                        PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog);
                         listOfPeerList.add(peer);
                         peer.start();
                     } catch (IOException | NumberFormatException e) {
@@ -468,14 +547,13 @@ public class ChatMainForm extends JFrame {
                         } else {
                             //JOptionPane.showMessageDialog(this, "invalid input");
                         }
-                    
+
                     }
 //                    if (txtChat.get(i)==null){
 //                        JTextArea pane = new JTextArea();
 //                        txtChat.add(pane);
 //                    }
-                    
-                    
+
                 } else {
                     JLabel onl_icon = new JLabel();
                     onl_icon.setText("");
@@ -492,23 +570,150 @@ public class ChatMainForm extends JFrame {
         }
     }
 
+    private void setTabValue_Requests() throws UnknownHostException, IOException {
+        RequestPanel.removeAll();
+        conn = new Socket(InetAddress.getLocalHost(), 9000);
+        reader = new TagReader(conn.getInputStream());
+        writer = new TagWriter(conn.getOutputStream());
+        RequestPanel.setLayout(new FlowLayout());
+        RequestPanel.setPreferredSize(new Dimension(325, 635));
+        String user_info = "<" + Accountid + ">";
+        String[] request = {Tags.FIND_REQUEST, user_info};
+
+        System.out.println("login info: " + user_info);
+        try {
+            TagValue tv = new TagValue(request[0], request[1].getBytes());
+            writer.writeTag(tv);
+            writer.flush();
+            tv = reader.getTagValue();
+            System.out.println(tv.getTag());
+            if (tv.getTag().equals(Tags.SUCCESS)) {
+
+                String allRequest = new String(tv.getContent()); // not formatted;
+
+                List<User> usrRequest = String2User(allRequest);
+                for (int i = 0; i < usrRequest.size(); i++) {
+                    String RequestName = usrRequest.get(i).getUser_name();
+                    JLabel label = new JLabel();
+                    label.setLayout(null);
+                    label.setPreferredSize(new Dimension(320, 100));
+                    label.setOpaque(true);
+                    label.setBackground(Color.GREEN);
+
+                    label.removeAll();
+
+                    label.setLocation(5, i * 50);
+                    JButton confirm = new JButton("Confirm");
+                    JButton cancle = new JButton("Cancle" + i);
+                    confirm.setBackground(Color.CYAN);
+
+                    //////////////////////////////////////// SET ACTION FOR CONFIRM AND CANCLE BTN////////////////////////////////////////////////
+                    confirm.addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            String content = "<" + RequestName + " " + Accountid + ">";
+                            String[] askF = {Tags.ACCEPT, content};
+                            try {
+                                conn = new Socket(InetAddress.getLocalHost(), 9000);
+                                reader = new TagReader(conn.getInputStream());
+                                writer = new TagWriter(conn.getOutputStream());
+                                TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
+                                writer.writeTag(tv2);
+                                writer.flush();
+                                tv2 = reader.getTagValue();
+                                if (tv2.getTag().equals(Tags.SUCCESS)) {
+                                    setTabValue_Friends();
+                                    setTabValue_Requests();
+                                    JOptionPane.showMessageDialog(confirm, "Request Confirmed");
+                                }
+                            } catch (Exception e) {
+                                System.err.println(e.getMessage());
+                            }
+                        }
+                    });
+                    cancle.addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(java.awt.event.ActionEvent evt
+                        ) {
+                            String content = "<" + RequestName + " " + Accountid + ">";
+                            System.out.println("content: " + content);
+                            String[] askF = {Tags.DELETE, content};
+                            try {
+                                conn = new Socket(InetAddress.getLocalHost(), 9000);
+                                reader = new TagReader(conn.getInputStream());
+                                writer = new TagWriter(conn.getOutputStream());
+                                TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
+                                writer.writeTag(tv2);
+                                writer.flush();
+                                System.out.println("Go here");
+                                tv2 = reader.getTagValue();
+                                if (tv2.getTag().equals(Tags.SUCCESS)) {
+                                    System.out.println("Not");
+                                    setTabValue_Friends();
+                                    setTabValue_Requests();
+
+                                    JOptionPane.showMessageDialog(cancle, "Request Cancled");
+                                }
+                            } catch (Exception e) {
+                                System.err.println(e.getMessage());
+                            }
+                        }
+
+                    });
+
+                    //////////////////////////////////////// SET ACTION FOR CONFIRM AND CANCLE BTN////////////////////////////////////////////////
+                    JLabel content = new JLabel();
+
+                    content.setText(usrRequest.get(i).getUser_name().toUpperCase() + " want to be your friend");
+                    content.setBounds(
+                            80, 5, 320, 30);
+                    confirm.setBounds(
+                            35, 40, 100, 50);
+                    cancle.setBounds(
+                            150, 40, 100, 50);
+
+                    label.add(content);
+
+                    label.add(confirm);
+
+                    label.add(cancle);
+
+                    confirm.setVisible(
+                            true);
+                    cancle.setVisible(
+                            true);
+                    label.setVisible(
+                            true);
+
+                    JLabel onl_icon = new JLabel();
+
+                    onl_icon.setText(
+                            "");
+                    onl_icon.setIcon(
+                            new javax.swing.ImageIcon(getClass().getResource("/chat_assignment/res/iconfinder_bulb_1511312.png")));
+                    onl_icon.setBounds(
+                            0, 5, 100, 200);
+
+                    RequestPanel.add(onl_icon);
+
+                    RequestPanel.add(label);
+
+                    RequestPanel.setVisible(true);
+                }
+
+            } else {
+//                JOptionPane.showMessageDialog(this, "Wrong Username or Password");
+            }
+        } catch (Exception e) {
+            //System.err.println("Network error");
+            e.printStackTrace();
+        }
+
+    }
+
     private void AttributeSetup() {
 
-        if (UserFriendsList != null) {
-//            System.out.println("User is not null");
-            if (!UserFriendsList.isEmpty()) {
-                Friendslist.clear();
-                for (int i = 0; i < UserFriendsList.size(); i++) {
-                    String x = UserFriendsList.get(i).getUser_name();
-//                    System.out.println("X: "+x);
-                    FriendStatus.add((UserFriendsList.get(i).getStatus()));
-//                    System.out.println(FriendStatus.get(0));
-                    Friendslist.add(x);
-                }
-            }
-        } else {
-            Friendslist = null;
-        }
+        updateFriendlist();
 //        txtMesslog.setLineWrap(true);
 //        txtMesslog.setWrapStyleWord(true);
 //        txtMessage.requestFocus();
@@ -518,16 +723,62 @@ public class ChatMainForm extends JFrame {
         jScrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         jPanel1.setPreferredSize(new Dimension(273, 50 * numOFriend));
 
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(10);
+        jScrollPane2.getVerticalScrollBar().setUnitIncrement(10);
+        jScrollPane3.getVerticalScrollBar().setUnitIncrement(10);
 
         this.setResizable(false);
 
     }
 
-    
+    private void resetallVar() {
+
+        listOfFriendButton = new ArrayList<>();
+        listOfPeerList = new ArrayList<>();
+        numOFriend = 0;
+        Accountid = "Sub";
+        Friendslist = new ArrayList<String>();
+        FriendStatus = new ArrayList<>();
+        UserFriendsList = new ArrayList<>();
+        final_sendUser = "xx";
+        info = ""; // use to store the param send from LoginForm to ChatMainform, so that it can be past to Search
+
+    }
+
+    private void Append_Message(String header, String content, Color headCol) {
+        if (!content.isEmpty()) {
+            Mess_header(header, headCol);
+            Mess_content(content);
+        }
+    }
+
+    private void Mess_header(String header, Color color) {
+//        if (!header.equals(final_sendUser)) {
+//            int len = txtMessLog.getDocument().getLength();
+//            txtMessLog.setCaretPosition(len);
+//            txtMessLog.setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 13), false);
+//            txtMessLog.replaceSelection(header + ":");
+//        } else {
+//            int len = txtMessLog.getDocument().getLength();
+//            txtMessLog.setCaretPosition(len);
+//            txtMessLog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.MAGENTA, "San Francisco", 13), false);
+//            for (int i = 0; i < header.length() + 3; i++) {
+//                txtMessLog.replaceSelection(" ");
+//            }
+//        }
+//        final_sendUser = header;
+    }
+
+    private void Mess_content(String content) {
+//        int len = txtMessLog.getDocument().getLength();
+//        txtMessLog.setCaretPosition(len);
+//        txtMessLog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false);
+//        txtMessLog.replaceSelection(content + "\n");
+    }
 
     private void setIcon() {
 
@@ -564,52 +815,53 @@ public class ChatMainForm extends JFrame {
             return;
         }
         BufferedReader buffer = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
-        BufferedReader bis;
+//        BufferedReader bis;
         String input;
         input = buffer.readLine();
-        if (input.length()<3 && input.contains("@f")) {
-            JFileChooser choosefile = new JFileChooser("d:");
-            choosefile.setAcceptAllFileFilterUsed(false);
-            choosefile.setDialogTitle("Select file");
-            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
-            choosefile.addChoosableFileFilter(restrict);
-            int conditionOfChooseFile = choosefile.showOpenDialog(null);
-            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
-                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
-                if (file.length() <= 5242880) {
-                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-                    StringWriter stringW = new StringWriter();
-                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><"+file.getName()+">");
-                    int n;
-                    char[] buff = new char[1024];
-                    while ((n = bis.read(buff)) != -1) {
-                        stringW.write(buff, 0, n);
-                    }
-                    serverThread.sendMessage(stringW.toString());
-                    printMessage(i,"You sent the file (" + file.getPath() + ") to your friend!!!");
-                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
-                } else {
-                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
-                }
-            }
-            txtMessage.setText("");
-            
-        } else {
-            StringWriter stringW = new StringWriter();
-            stringW.append("@a:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + ">[" + UserInformation[1] + "]:" + input);
-            serverThread.sendMessage(stringW.toString());
-            if (input != null) {
-                printMessage(i,input);
-            }
+//        if (input.length() < 3 && input.contains("@f")) {
+//            JFileChooser choosefile = new JFileChooser("d:");
+//            choosefile.setAcceptAllFileFilterUsed(false);
+//            choosefile.setDialogTitle("Select file");
+//            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+//            choosefile.addChoosableFileFilter(restrict);
+//            int conditionOfChooseFile = choosefile.showOpenDialog(null);
+//            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+//                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+//                if (file.length() <= 5242880) {
+//                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+//                    StringWriter stringW = new StringWriter();
+//                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
+//                    int n;
+//                    char[] buff = new char[1024];
+//                    while ((n = bis.read(buff)) != -1) {
+//                        stringW.write(buff, 0, n);
+//                    }
+//                    serverThread.sendMessage(stringW.toString());
+//                    printMessage(i, "You sent the file (" + file.getPath() + ") to your friend!!!");
+//                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+//                } else {
+//                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+//                }
+//            }
+//            txtMessage.setText("");
+
+        //} else {
+        StringWriter stringW = new StringWriter();
+        stringW.append("@a:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + ">[" + UserInformation[1] + "]:" + input);
+        serverThread.sendMessage(stringW.toString());
+        if (input != null) {
+            printMessage(i, input);
         }
+//        }
     }
-    private void printMessage(int i, String message)
-    {
-        txtChat.get(i).append("[___________________]:"+message + "\n");
+
+    private void printMessage(int i, String message) {
+        txtChat.get(i).append("[___________________]:" + message + "\n");
         txtMessLog.setText(txtChat.get(i).getText());
         //txtMessLog.updateUI();
         txtMessage.setText("");
     }
+
     private java.util.List<User> ImportListFriends() {
         //String[] request = {Tags.FIND_FRIEND, "<trung>"};
         String[] askF = {Tags.FIND_FRIEND, "<" + UserInformation[1] + ">"};
@@ -624,11 +876,11 @@ public class ChatMainForm extends JFrame {
             writer.flush();
             tv2 = reader.getTagValue();
 //                System.out.println("ask: "+ tv2.getTag());
-            
+
             if (tv2.getTag().equals(Tags.SUCCESS)) {
                 users = getUsers(tv2.getContent());
                 for (User usr : users) {
-                        System.out.println("get this: "+usr.getUser_name());
+                    System.out.println("get this: " + usr.getUser_name());
                 }
             }
             conn.close();
@@ -637,8 +889,8 @@ public class ChatMainForm extends JFrame {
         }
         return users;
     }
-    
-     private java.util.List<User> getUsers(byte[] content) {
+
+    private java.util.List<User> getUsers(byte[] content) {
         String string = new String(content);
         string = string.replace("<", "");
         string = string.replace(">", "");
@@ -652,11 +904,10 @@ public class ChatMainForm extends JFrame {
         }
         return users;
     }
-    
-    
+
     private void LogoutPerformed(java.awt.event.ActionEvent evt) {
         int confirm = JOptionPane.showConfirmDialog(this, "Logout?");
-        //if (confirm == 0) {
+        if (confirm == 0) {
             try {
                 Socket conn = new Socket(InetAddress.getLocalHost(), 9000);
                 reader = new TagReader(conn.getInputStream());
@@ -667,22 +918,46 @@ public class ChatMainForm extends JFrame {
                 writer.writeTag(tv);
                 writer.flush();
                 tv = reader.getTagValue();
-//                if (tv.getTag().equals(Tags.SUCCESS)) {
-//                    this.setVisible(false);
-//                    LoginForm Login = new LoginForm();
-//                    Login.setVisible(true);
-//                }
+                if (tv.getTag().equals(Tags.SUCCESS)) {
+                    this.setVisible(false);
+                    LoginForm Login = new LoginForm();
+                    Login.setVisible(true);
+                }
                 conn.close();
             } catch (Exception e) {
 
             }
-        //}
-        System.exit(0);
+        }
+//        System.exit(0);
         //else 
         //    System.exit(0);
     }
+
+    private void updateFriendlist() {
+        if (UserFriendsList != null) {
+//            System.out.println("User is not null");
+            if (!UserFriendsList.isEmpty()) {
+                if (Friendslist != null) {
+                    if (!Friendslist.isEmpty()) {
+                        Friendslist.clear();
+                    }
+
+                    for (int i = 0; i < UserFriendsList.size(); i++) {
+                        String x = UserFriendsList.get(i).getUser_name();
+                        FriendStatus.add((UserFriendsList.get(i).getStatus()));
+                        Friendslist.add(x);
+                    }
+                }
+            }
+        } else {
+            Friendslist = null;
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton File;
     private javax.swing.JButton Refresh;
+    private javax.swing.JPanel RequestPanel;
+    private javax.swing.JButton Send;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -693,13 +968,29 @@ public class ChatMainForm extends JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextArea txtMessLog;
     private javax.swing.JTextField txtMessage;
     // End of variables declaration//GEN-END:variables
+    private List<User> String2User(String allRequest) {
+        List<User> lst = new ArrayList<>();
+        allRequest = allRequest.replace("<", "");
+        allRequest = allRequest.replace(">", "");
+        String[] flatten = allRequest.split("\\|");
+        for (String x : flatten) {
+
+            String[] temp = x.split(" ", 4);
+            int Id = Integer.valueOf(temp[0]);
+            String name = temp[1];
+            String IP = temp[2];
+            int status = Integer.valueOf(temp[3]);
+            User usr = new User(Id, name, IP, status);
+            lst.add(usr);
+        }
+        return lst;
+    }
 }

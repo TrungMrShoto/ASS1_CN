@@ -1,10 +1,23 @@
 package chat_assignment;
 
+import commom.TagReader;
+import commom.TagValue;
+import commom.TagWriter;
+import commom.Tags;
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class RegisterForm extends javax.swing.JFrame {
-
+    private Socket conn;
+    private TagReader reader;
+    private TagWriter writer;
+    private String[] request;
     public RegisterForm() {
         setTitle("Register");
         initComponents();setIcon();
@@ -29,7 +42,7 @@ public class RegisterForm extends javax.swing.JFrame {
         txtPass02 = new javax.swing.JPasswordField();
         ckbPassword = new javax.swing.JCheckBox();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         jLabel3.setText("Username:");
 
@@ -111,7 +124,13 @@ public class RegisterForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        CreateAccount();
+        
+        try {
+            CreateAccount();
+        } catch (IOException ex) {
+            Logger.getLogger(RegisterForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -135,7 +154,7 @@ public class RegisterForm extends javax.swing.JFrame {
             txtPass02.setEchoChar('*');
         }
     }//GEN-LAST:event_ckbPasswordActionPerformed
-    private void CreateAccount(){
+    private void CreateAccount()throws UnknownHostException, IOException{
         String Username=txtUsername.getText();
         String Password=txtPass01.getText();
         String RePass=txtPass02.getText();
@@ -144,13 +163,34 @@ public class RegisterForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this,"Password is not the same!!!");
             }
             else
-            {
-                // xử lý DATABASE
-                
-                
-                JOptionPane.showMessageDialog(this,"Success creating Account!!!");
+            {        conn = new Socket(InetAddress.getLocalHost(), 9000);
+            reader = new TagReader(conn.getInputStream());
+            writer = new TagWriter(conn.getOutputStream());
+        
+        
+
+            String Register_info = "<" + Username + " " + Password + ">";
+            String[] request = {Tags.REGISTER, Register_info};
+
+            System.out.println("register info: " + Register_info);
+            try {
+
+                TagValue tv = new TagValue(request[0], request[1].getBytes());
+                writer.writeTag(tv);
+                writer.flush();
+                tv = reader.getTagValue();
+                System.out.println(tv.getTag());
+                if (tv.getTag().equals(Tags.SUCCESS)) {
+                   JOptionPane.showMessageDialog(this,"Success creating Account!!!");
                 dispose();
-                new LoginForm().setVisible(true);
+                new LoginForm().setVisible(true);              
+                } else {
+                    JOptionPane.showMessageDialog(this, "Username is taken, please try other name");
+                }
+            } catch (Exception e) {
+                //System.err.println("Network error");
+                e.printStackTrace();
+            }
             }
         else {
             JOptionPane.showMessageDialog(this, "You must fill all the blanks!!!");

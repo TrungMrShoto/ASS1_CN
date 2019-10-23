@@ -57,20 +57,20 @@ public class LoginForm extends javax.swing.JFrame {
         return systemipaddress;
     }
 
-//    private java.util.List<User> getUsers(byte[] content) {
-//        String string = new String(content);
-//        string = string.replace("<", "");
-//        string = string.replace(">", "");
-//
-//        String[] arrString = string.split("\\|");
-//        java.util.List<User> users = new ArrayList<>();
-//
-//        for (String str : arrString) {
-//            String[] arrAttr = str.split(" ");
-//            users.add(new User(Integer.parseInt(arrAttr[0]), arrAttr[1], arrAttr[2], Integer.parseInt(arrAttr[3])));
-//        }
-//        return users;
-//    }
+    private java.util.List<User> getUsers(byte[] content) {
+        String string = new String(content);
+        string = string.replace("<", "");
+        string = string.replace(">", "");
+
+        String[] arrString = string.split("\\|");
+        java.util.List<User> users = new ArrayList<>();
+
+        for (String str : arrString) {
+            String[] arrAttr = str.split(" ");
+            users.add(new User(Integer.parseInt(arrAttr[0]), arrAttr[1], arrAttr[2], Integer.parseInt(arrAttr[3])));
+        }
+        return users;
+    }
 
     public LoginForm() {
         setTitle("Welcome to our Chat Room");
@@ -102,7 +102,7 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -258,10 +258,10 @@ public class LoginForm extends javax.swing.JFrame {
                 System.out.println(tv.getTag());
                 if (tv.getTag().equals(Tags.SUCCESS)) {
                     System.out.println("Log in success");
-                    //List<User> friendList = ImportListFriends(userName);
+                    List<User> friendList = ImportListFriends(userName);
 //                   System.out.println("what: "+ friendList.get(0).getUser_name());
                     dispose();
-                    JFrame chat =  new ChatMainForm(new String(tv.getContent()));
+                    JFrame chat = new ChatMainForm(new String(tv.getContent()), friendList);
                     //System.out.println( new String(tv.getContent()));
                     chat.setVisible(true);
                 } else {
@@ -356,37 +356,7 @@ public class LoginForm extends javax.swing.JFrame {
         txtUsername.setFocusTraversalKeysEnabled(false);
         txtPassword.setFocusTraversalKeysEnabled(false);
     }
-     private void setIcon() {
-
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/chat_assignment/res/iconfinder_flower_1055057.png")));
-    }
-
-//    private java.util.List<User> ImportListFriends(String username) {
-//        String[] request = {Tags.FIND_FRIEND, "<trung>"};
-//        String[] askF = {Tags.FIND_FRIEND, "<" + username + ">"};
-//        List<User> users = null;
-//        try {
-//
-//            conn = new Socket(InetAddress.getLocalHost(), 9000);
-//            reader = new TagReader(conn.getInputStream());
-//            writer = new TagWriter(conn.getOutputStream());
-//            TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
-//            writer.writeTag(tv2);
-//            writer.flush();
-//            tv2 = reader.getTagValue();
-////                System.out.println("ask: "+ tv2.getTag());
-//            if (tv2.getTag().equals(Tags.SUCCESS)) {
-//                users = getUsers(tv2.getContent());
-//                for (User usr : users) {
-////                        System.out.println("get this: "+usr.getUser_name());
-//                }
-//            }
-//
-//        } catch (Exception e) {
-//            System.err.println("Network error");
-//        }
-//        return users;
-//    }
+     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ckbPassword;
@@ -401,5 +371,35 @@ public class LoginForm extends javax.swing.JFrame {
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 
-   
+   private void setIcon() {
+
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/chat_assignment/res/iconfinder_flower_1055057.png")));
+    }
+
+    private java.util.List<User> ImportListFriends(String username) {   
+        String[] askF = {Tags.FIND_FRIEND, "<" + username + ">"};
+        List<User> users = null;
+        try {
+
+            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            reader = new TagReader(conn.getInputStream());
+            writer = new TagWriter(conn.getOutputStream());
+            TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
+            writer.writeTag(tv2);
+            writer.flush();
+            tv2 = reader.getTagValue();
+//                System.out.println("ask: "+ tv2.getTag());
+            if (tv2.getTag().equals(Tags.SUCCESS)) {
+                users = getUsers(tv2.getContent());
+                for (User usr : users) {
+//                        System.out.println("get this: "+usr.getUser_name());
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Network error");
+        }
+        return users;
+    }
 }
+
