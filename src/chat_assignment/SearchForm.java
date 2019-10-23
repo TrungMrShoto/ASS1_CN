@@ -351,7 +351,7 @@ public class SearchForm extends javax.swing.JFrame {
         try {
 //            tblSearchoutput= new JTable(dm);
 
-            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            conn = new Socket(ServerInfo.IP, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             String[] request = {Tags.SEARCH, "<" + input + ">"};

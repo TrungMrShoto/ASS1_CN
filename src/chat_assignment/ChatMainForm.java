@@ -54,7 +54,7 @@ import sun.security.x509.IPAddressName;
  * @author Meep
  */
 public class ChatMainForm extends JFrame {
-    private String IP_host = "10.28.3.87";
+    //private String ServerInfo.IP = "10.28.3.87";
     private Socket conn;
     private TagReader reader;
     private TagWriter writer;
@@ -218,6 +218,11 @@ public class ChatMainForm extends JFrame {
         });
 
         File.setText("jButton2");
+        File.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FileActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
@@ -393,6 +398,61 @@ public class ChatMainForm extends JFrame {
         }
     }//GEN-LAST:event_SendActionPerformed
 
+    private void FileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FileActionPerformed
+        int j = -1;
+        for (int i = 0; i < listOfFriendButton.size(); i++) {
+            if (listOfFriendButton.get(i).getBackground() == Color.cyan) {
+                j = i;
+                break;
+            }
+        }
+        if (j != -1) {
+            try {
+                sendFile(j);
+            } catch (IOException ex) {
+                Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "You must choose your friend first!");
+        }
+    }//GEN-LAST:event_FileActionPerformed
+
+    private void sendFile(int i) throws IOException{
+        if (UserFriendsList.get(i).getStatus() == 0) {
+            JOptionPane.showMessageDialog(null, "Your friend isn't online");
+            return;
+        }
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        BufferedReader bis;
+        String input;
+        input = buffer.readLine();
+        //if (input.length() < 3 && input.contains("@f")) {
+            JFileChooser choosefile = new JFileChooser("d:");
+            choosefile.setAcceptAllFileFilterUsed(false);
+            choosefile.setDialogTitle("Select file");
+            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+            choosefile.addChoosableFileFilter(restrict);
+            int conditionOfChooseFile = choosefile.showOpenDialog(null);
+            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+                if (file.length() <= 5242880) {
+                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                    StringWriter stringW = new StringWriter();
+                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
+                    int n;
+                    char[] buff = new char[1024];
+                    while ((n = bis.read(buff)) != -1) {
+                        stringW.write(buff, 0, n);
+                    }
+                    serverThread.sendMessage(stringW.toString());
+                    printMessage(i, "You sent the file (" + file.getPath() + ") to your friend!!!");
+                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+                }
+            }
+            txtMessage.setText("");
+    }
     private void choose_Client() throws IOException {
         int j = -1;
         for (int i = 0; i < listOfFriendButton.size(); i++) {
@@ -572,7 +632,7 @@ public class ChatMainForm extends JFrame {
 
     private void setTabValue_Requests() throws UnknownHostException, IOException {
         RequestPanel.removeAll();
-        conn = new Socket(IP_host, 9000);
+        conn = new Socket(ServerInfo.IP, 9000);
         reader = new TagReader(conn.getInputStream());
         writer = new TagWriter(conn.getOutputStream());
         RequestPanel.setLayout(new FlowLayout());
@@ -614,7 +674,7 @@ public class ChatMainForm extends JFrame {
                             String content = "<" + RequestName + " " + Accountid + ">";
                             String[] askF = {Tags.ACCEPT, content};
                             try {
-                                conn = new Socket(IP_host, 9000);
+                                conn = new Socket(ServerInfo.IP, 9000);
                                 reader = new TagReader(conn.getInputStream());
                                 writer = new TagWriter(conn.getOutputStream());
                                 TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -639,7 +699,7 @@ public class ChatMainForm extends JFrame {
                             System.out.println("content: " + content);
                             String[] askF = {Tags.DELETE, content};
                             try {
-                                conn = new Socket(IP_host, 9000);
+                                conn = new Socket(ServerInfo.IP, 9000);
                                 reader = new TagReader(conn.getInputStream());
                                 writer = new TagWriter(conn.getOutputStream());
                                 TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -868,7 +928,7 @@ public class ChatMainForm extends JFrame {
         List<User> users = null;
         try {
 
-            Socket conn = new Socket(IP_host, 9000);
+            Socket conn = new Socket(ServerInfo.IP, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -909,7 +969,7 @@ public class ChatMainForm extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this, "Logout?");
         if (confirm == 0) {
             try {
-                Socket conn = new Socket(IP_host, 9000);
+                Socket conn = new Socket(ServerInfo.IP, 9000);
                 reader = new TagReader(conn.getInputStream());
                 writer = new TagWriter(conn.getOutputStream());
                 String[] request = {Tags.LOGOUT, "<" + Accountid + ">"};

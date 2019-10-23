@@ -163,7 +163,7 @@ public class RegisterForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this,"Password is not the same!!!");
             }
             else
-            {        conn = new Socket(InetAddress.getLocalHost(), 9000);
+            {        conn = new Socket(ServerInfo.IP, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
         

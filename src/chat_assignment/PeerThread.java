@@ -46,13 +46,13 @@ public class PeerThread extends Thread {
         while (flag) {
             try {
                 message = buffered.readLine();
-//
-//                header = message.substring(0, 2);
-//                message = message.substring(message.indexOf("<"));
-//                String ID_ME = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
-//                message = message.substring(message.indexOf("<") + ID_ME.length() + 2);
-//                String friend_ID = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
-//                message = message.substring(message.indexOf("<") + friend_ID.length() + 2);
+
+                header = message.substring(0, 2);
+                message = message.substring(message.indexOf("<"));
+                String ID_ME = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
+                message = message.substring(message.indexOf("<") + ID_ME.length() + 2);
+                String friend_ID = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
+                message = message.substring(message.indexOf("<") + friend_ID.length() + 2);
 //                if (header.equals("@f")) {
 //                    String friend_name = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
 //                    message = message.substring(message.indexOf("<") + 2 + friend_name.length());
