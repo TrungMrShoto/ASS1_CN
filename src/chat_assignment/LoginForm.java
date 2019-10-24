@@ -245,7 +245,7 @@ public class LoginForm extends javax.swing.JFrame {
         Boolean flag;
         if (!userName.isEmpty() && !userPassword.isEmpty()) {
 
-            String Login_info = "<" + userName + " " + userPassword + " " + getPublicIP() + ">";
+            String Login_info = "<" + userName + " " + userPassword + " " + ServerInfo.getIP() + ">";
             String[] request = {Tags.LOGIN, Login_info};
 
             System.out.println("login info: " + Login_info);

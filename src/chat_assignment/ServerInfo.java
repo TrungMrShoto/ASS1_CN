@@ -5,10 +5,24 @@
  */
 package chat_assignment;
 
+import java.net.InetAddress;
+
 /**
  *
  * @author dell
  */
 public class ServerInfo {
-    public static String IP = "10.28.3.87";
+
+    /**
+     *
+     */
+    private static ParseRoute pr = ParseRoute.getInstance();
+    public static String IP = "10.1.1.25";
+    public static String getIP()
+    {
+        return pr.getLocalIPAddress();
+    }
+   
+     
+    //public static String IP = ;
 }

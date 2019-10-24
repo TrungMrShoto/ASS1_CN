@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -206,6 +207,7 @@ public class ChatMainForm extends JFrame {
             }
         });
 
+        txtMessLog.setEditable(false);
         txtMessLog.setColumns(20);
         txtMessLog.setRows(5);
         jScrollPane5.setViewportView(txtMessLog);
@@ -367,6 +369,7 @@ public class ChatMainForm extends JFrame {
         if (txtChat.size() == 0) {
             for (int i = 0; i < UserFriendsList.size(); i++) {
                 JTextArea pane = new JTextArea();
+                pane.setBounds(i, i, WIDTH, HEIGHT);
                 txtChat.add(pane);
             }
         }
@@ -422,10 +425,11 @@ public class ChatMainForm extends JFrame {
             JOptionPane.showMessageDialog(null, "Your friend isn't online");
             return;
         }
-        BufferedReader buffer = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        //BufferedReader buffer = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
+        //BufferedInputStream bis;
         BufferedReader bis;
-        String input;
-        input = buffer.readLine();
+        //String input;
+        //input = buffer.readLine();
         //if (input.length() < 3 && input.contains("@f")) {
             JFileChooser choosefile = new JFileChooser("d:");
             choosefile.setAcceptAllFileFilterUsed(false);
@@ -437,6 +441,11 @@ public class ChatMainForm extends JFrame {
                 File file = new File(choosefile.getSelectedFile().getAbsolutePath());
                 if (file.length() <= 5242880) {
                     bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                    //FileInputStream fis = new FileInputStream(file);
+                    //bis = new BufferedInputStream(fis);
+                    //byte[] myarray = new byte[(int)file.length()];
+                    //bis.read(myarray,0,myarray.length);
+                    //bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
                     StringWriter stringW = new StringWriter();
                     stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
                     int n;
@@ -559,28 +568,29 @@ public class ChatMainForm extends JFrame {
 
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        int j=0;
                         for (int i = 0; i < listOfFriendButton.size(); i++) {
                             if (listOfFriendButton.get(i) != btn) {
                                 listOfFriendButton.get(i).setBackground(new JButton().getBackground());
+                                txtChat.get(i).setVisible(false);
                             }
+                            else 
+                                j=i;
+                            
+                            
                         }
                         btn.setBackground(Color.cyan);
-//                        }
-//                        try {
-//                            SendMessage(listOfFriendButton.indexOf(btn));
-//                        } catch (IOException ex) {
-//                            Logger.getLogger(ChatMainForm.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-//                        SwingUtilities.invokeLater(new Runnable() {
-//                            public void run() {
-//                                txtMessLog.updateUI();
-//                            }
-//                        });
-//                        //final_sendUser = "xxx";
-//                        
-//                        //txtMessLog.setText("");
-//                        
-
+                        txtMessLog.setVisible(false);
+                        txtChat.get(j).setColumns(20);
+                        txtChat.get(j).setRows(5);
+                        txtChat.get(j).setEditable(false);
+                        jScrollPane5.setViewportView(txtChat.get(j));
+                        txtChat.get(j).setVisible(true);     
+                        txtMessLog.setEditable(false);
+//                        txtMessLog.setColumns(20);
+//                        txtMessLog.setRows(5);
+//                        jScrollPane5.setViewportView(txtMessLog);
+                        
                     }
 
                 });
@@ -598,7 +608,7 @@ public class ChatMainForm extends JFrame {
 
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
                         socket = new Socket(UserFriendsList.get(i).getIP_addr(), UserFriendsList.get(i).getID() + 9000);
-                        PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog);
+                        PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog, UserFriendsList.get(i).getID(),Integer.valueOf(UserInformation[0]));
                         listOfPeerList.add(peer);
                         peer.start();
                     } catch (IOException | NumberFormatException e) {
@@ -854,20 +864,20 @@ public class ChatMainForm extends JFrame {
         serverThread.start();
     }
 
-    public String getPublicIP() throws IOException {
-
-        // Find public IP address 
-        String systemipaddress = "";
-
-        URL url_name = new URL("http://bot.whatismyipaddress.com");
-
-        BufferedReader sc
-                = new BufferedReader(new InputStreamReader(url_name.openStream()));
-
-        // reads system IPAddress 
-        systemipaddress = sc.readLine().trim();
-        return systemipaddress;
-    }
+//    public String getPublicIP() throws IOException {
+//
+//        // Find public IP address 
+//        String systemipaddress = "";
+//
+//        URL url_name = new URL("http://bot.whatismyipaddress.com");
+//
+//        BufferedReader sc
+//                = new BufferedReader(new InputStreamReader(url_name.openStream()));
+//
+//        // reads system IPAddress 
+//        systemipaddress = sc.readLine().trim();
+//        return systemipaddress;
+//    }
 
     private void SendMessage(int i) throws IOException {
         if (UserFriendsList.get(i).getStatus() == 0) {
@@ -875,44 +885,44 @@ public class ChatMainForm extends JFrame {
             return;
         }
         BufferedReader buffer = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(txtMessage.getText().getBytes())));
-//        BufferedReader bis;
+        BufferedReader bis;
         String input;
         input = buffer.readLine();
-//        if (input.length() < 3 && input.contains("@f")) {
-//            JFileChooser choosefile = new JFileChooser("d:");
-//            choosefile.setAcceptAllFileFilterUsed(false);
-//            choosefile.setDialogTitle("Select file");
-//            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
-//            choosefile.addChoosableFileFilter(restrict);
-//            int conditionOfChooseFile = choosefile.showOpenDialog(null);
-//            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
-//                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
-//                if (file.length() <= 5242880) {
-//                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-//                    StringWriter stringW = new StringWriter();
-//                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
-//                    int n;
-//                    char[] buff = new char[1024];
-//                    while ((n = bis.read(buff)) != -1) {
-//                        stringW.write(buff, 0, n);
-//                    }
-//                    serverThread.sendMessage(stringW.toString());
-//                    printMessage(i, "You sent the file (" + file.getPath() + ") to your friend!!!");
-//                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
-//                } else {
-//                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
-//                }
-//            }
-//            txtMessage.setText("");
+        if (input.length() < 3 && input.contains("@f")) {
+            JFileChooser choosefile = new JFileChooser("d:");
+            choosefile.setAcceptAllFileFilterUsed(false);
+            choosefile.setDialogTitle("Select file");
+            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+            choosefile.addChoosableFileFilter(restrict);
+            int conditionOfChooseFile = choosefile.showOpenDialog(null);
+            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+                if (file.length() <= 5242880) {
+                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                    StringWriter stringW = new StringWriter();
+                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
+                    int n;
+                    char[] buff = new char[1024];
+                    while ((n = bis.read(buff)) != -1) {
+                        stringW.write(buff, 0, n);
+                    }
+                    serverThread.sendMessage(stringW.toString());
+                    printMessage(i, "You sent the file (" + file.getPath() + ") to your friend!!!");
+                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+                }
+            }
+            txtMessage.setText("");
 
-        //} else {
+        } else {
         StringWriter stringW = new StringWriter();
         stringW.append("@a:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + ">[" + UserInformation[1] + "]:" + input);
         serverThread.sendMessage(stringW.toString());
         if (input != null) {
             printMessage(i, input);
         }
-//        }
+        }
     }
 
     private void printMessage(int i, String message) {
