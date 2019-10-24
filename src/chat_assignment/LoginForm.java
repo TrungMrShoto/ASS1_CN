@@ -38,7 +38,7 @@ public class LoginForm extends javax.swing.JFrame {
     private TagReader reader;
     private TagWriter writer;
     private String[] request;
-//    private String ServerInfo.IP = "10.28.3.87";
+//    private String InetAddress.getLocalHost() = "10.28.3.87";
 
     /**
      * Creates new form LoginForm
@@ -236,7 +236,7 @@ public class LoginForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
     private void Connect2Server() throws UnknownHostException, IOException {
-        conn = new Socket(ServerInfo.IP, 9000);
+        conn = new Socket(InetAddress.getLocalHost(), 9000);
         reader = new TagReader(conn.getInputStream());
         writer = new TagWriter(conn.getOutputStream());
         User user;
@@ -382,7 +382,7 @@ public class LoginForm extends javax.swing.JFrame {
         List<User> users = null;
         try {
 
-            conn = new Socket(ServerInfo.IP, 9000);
+            conn = new Socket(InetAddress.getLocalHost(), 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
