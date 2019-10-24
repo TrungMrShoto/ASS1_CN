@@ -1,4 +1,4 @@
-package client;
+package chat_assignment;
 import java.io.*;
 import java.util.*;
 
