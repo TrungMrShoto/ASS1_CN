@@ -55,7 +55,7 @@ import sun.security.x509.IPAddressName;
  * @author Meep
  */
 public class ChatMainForm extends JFrame {
-    
+
     //private String ServerInfo.IP = "10.28.3.87";
     private Socket conn;
     private TagReader reader;
@@ -386,6 +386,9 @@ public class ChatMainForm extends JFrame {
 
     private void txtMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMessageKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (txtMessage.getText().equals("") || txtMessage.getText().isEmpty()) {
+                return;
+            }
             try {
                 choose_Client();
             } catch (IOException ex) {
@@ -395,6 +398,7 @@ public class ChatMainForm extends JFrame {
     }//GEN-LAST:event_txtMessageKeyPressed
 
     private void SendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendActionPerformed
+
         try {
             choose_Client();
         } catch (IOException ex) {
@@ -421,7 +425,7 @@ public class ChatMainForm extends JFrame {
         }
     }//GEN-LAST:event_FileActionPerformed
 
-    private void sendFile(int i) throws IOException{
+    private void sendFile(int i) throws IOException {
         if (UserFriendsList.get(i).getStatus() == 0) {
             JOptionPane.showMessageDialog(null, "Your friend isn't online");
             return;
@@ -432,37 +436,38 @@ public class ChatMainForm extends JFrame {
         //String input;
         //input = buffer.readLine();
         //if (input.length() < 3 && input.contains("@f")) {
-            JFileChooser choosefile = new JFileChooser("d:");
-            choosefile.setAcceptAllFileFilterUsed(false);
-            choosefile.setDialogTitle("Select file");
-            FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
-            choosefile.addChoosableFileFilter(restrict);
-            int conditionOfChooseFile = choosefile.showOpenDialog(null);
-            if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
-                File file = new File(choosefile.getSelectedFile().getAbsolutePath());
-                if (file.length() <= 5242880) {
-                    bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-                    //FileInputStream fis = new FileInputStream(file);
-                    //bis = new BufferedInputStream(fis);
-                    //byte[] myarray = new byte[(int)file.length()];
-                    //bis.read(myarray,0,myarray.length);
-                    //bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-                    StringWriter stringW = new StringWriter();
-                    stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
-                    int n;
-                    char[] buff = new char[1024];
-                    while ((n = bis.read(buff)) != -1) {
-                        stringW.write(buff, 0, n);
-                    }
-                    serverThread.sendMessage(stringW.toString());
-                    printMessage(i, "You sent the file (" + file.getPath() + ") to your friend!!!");
-                    //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
-                } else {
-                    JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
+        JFileChooser choosefile = new JFileChooser("d:");
+        choosefile.setAcceptAllFileFilterUsed(false);
+        choosefile.setDialogTitle("Select file");
+        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+        choosefile.addChoosableFileFilter(restrict);
+        int conditionOfChooseFile = choosefile.showOpenDialog(null);
+        if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
+            File file = new File(choosefile.getSelectedFile().getAbsolutePath());
+            if (file.length() <= 5242880) {
+                bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                //FileInputStream fis = new FileInputStream(file);
+                //bis = new BufferedInputStream(fis);
+                //byte[] myarray = new byte[(int)file.length()];
+                //bis.read(myarray,0,myarray.length);
+                //bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+                StringWriter stringW = new StringWriter();
+                stringW.append("@f:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + "><" + UserInformation[1] + "><" + file.getName() + ">");
+                int n;
+                char[] buff = new char[1024];
+                while ((n = bis.read(buff)) != -1) {
+                    stringW.write(buff, 0, n);
                 }
+                serverThread.sendMessage(stringW.toString());
+                printMessage(i, "You sent the file (" + file.getPath() + ") to your friend!!!");
+                //ChatHistory.setText(ChatHistory.getText() + "\n You sent the file (" + file.getPath() + ") to your friend!!!");
+            } else {
+                JOptionPane.showMessageDialog(this, "File must be less and equal than 5MB!!!!\n You can't send this file.");
             }
-            txtMessage.setText("");
+        }
+        txtMessage.setText("");
     }
+
     private void choose_Client() throws IOException {
         int j = -1;
         for (int i = 0; i < listOfFriendButton.size(); i++) {
@@ -569,16 +574,15 @@ public class ChatMainForm extends JFrame {
 
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        int j=0;
+                        int j = 0;
                         for (int i = 0; i < listOfFriendButton.size(); i++) {
                             if (listOfFriendButton.get(i) != btn) {
                                 listOfFriendButton.get(i).setBackground(new JButton().getBackground());
                                 txtChat.get(i).setVisible(false);
+                            } else {
+                                j = i;
                             }
-                            else 
-                                j=i;
-                            
-                            
+
                         }
                         btn.setBackground(Color.cyan);
                         txtMessLog.setVisible(false);
@@ -586,12 +590,12 @@ public class ChatMainForm extends JFrame {
                         txtChat.get(j).setRows(5);
                         txtChat.get(j).setEditable(false);
                         jScrollPane5.setViewportView(txtChat.get(j));
-                        txtChat.get(j).setVisible(true);     
+                        txtChat.get(j).setVisible(true);
                         txtMessLog.setEditable(false);
 //                        txtMessLog.setColumns(20);
 //                        txtMessLog.setRows(5);
 //                        jScrollPane5.setViewportView(txtMessLog);
-                        
+
                     }
 
                 });
@@ -608,8 +612,8 @@ public class ChatMainForm extends JFrame {
                         System.out.println(UserFriendsList.get(i).getID() + 9000);
 
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
-                        socket = new Socket("localhost", UserFriendsList.get(i).getID() + 9000);
-                        PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog, UserFriendsList.get(i).getID(),Integer.valueOf(UserInformation[0]));
+                        socket = new Socket("10.28.8.143", UserFriendsList.get(i).getID() + 9000);
+                        PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog, UserFriendsList.get(i).getID(), Integer.valueOf(UserInformation[0]));
                         listOfPeerList.add(peer);
                         peer.start();
                     } catch (IOException | NumberFormatException e) {
@@ -879,7 +883,6 @@ public class ChatMainForm extends JFrame {
 //        systemipaddress = sc.readLine().trim();
 //        return systemipaddress;
 //    }
-
     private void SendMessage(int i) throws IOException {
         if (UserFriendsList.get(i).getStatus() == 0) {
             JOptionPane.showMessageDialog(null, "Your friend isn't online");
@@ -917,12 +920,12 @@ public class ChatMainForm extends JFrame {
             txtMessage.setText("");
 
         } else {
-        StringWriter stringW = new StringWriter();
-        stringW.append("@a:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + ">[" + UserInformation[1] + "]:" + input);
-        serverThread.sendMessage(stringW.toString());
-        if (input != null) {
-            printMessage(i, input);
-        }
+            StringWriter stringW = new StringWriter();
+            stringW.append("@a:<" + UserFriendsList.get(i).getID() + "><" + UserInformation[0] + ">[" + UserInformation[1] + "]:" + input);
+            serverThread.sendMessage(stringW.toString());
+            if (input != null) {
+                printMessage(i, input);
+            }
         }
     }
 
