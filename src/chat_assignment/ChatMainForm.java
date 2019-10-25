@@ -55,7 +55,6 @@ import sun.security.x509.IPAddressName;
  * @author Meep
  */
 public class ChatMainForm extends JFrame {
-
     //private String ServerInfo.IP = "10.28.3.87";
     private Socket conn;
     private TagReader reader;
@@ -612,7 +611,7 @@ public class ChatMainForm extends JFrame {
                         System.out.println(UserFriendsList.get(i).getID() + 9000);
 
                         //socket = new Socket(InetAddress.getByAddress(UserFriendsList.get(i).getIP_addr().getBytes()).getCanonicalHostName(), UserFriendsList.get(i).getID()+9000);
-                        socket = new Socket("10.28.8.143", UserFriendsList.get(i).getID() + 9000);
+                        socket = new Socket(UserFriendsList.get(i).getIP_addr(), UserFriendsList.get(i).getID() + 9000);
                         PeerThread peer = new PeerThread(socket, txtChat.get(i), txtMessLog, UserFriendsList.get(i).getID(), Integer.valueOf(UserInformation[0]));
                         listOfPeerList.add(peer);
                         peer.start();
