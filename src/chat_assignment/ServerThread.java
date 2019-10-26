@@ -36,6 +36,7 @@ public class ServerThread extends Thread{
 	void sendMessage(String message) {
 		try {
 			serverTTs.forEach(t-> t.getPrintWriter().println(message));
+                       // System.out.println("++++++++++"+ message);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
