@@ -1,4 +1,0 @@
-chat_assignment.ButtonRenderer
-chat_assignment.ButtonEditor$1
-chat_assignment.SearchForm
-chat_assignment.ButtonEditor

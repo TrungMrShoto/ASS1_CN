@@ -43,20 +43,20 @@ public class LoginForm extends javax.swing.JFrame {
     /**
      * Creates new form LoginForm
      */
-    public String getPublicIP() throws IOException {
-
-        // Find public IP address 
-        String systemipaddress = "";
-
-        URL url_name = new URL("http://bot.whatismyipaddress.com");
-
-        BufferedReader sc
-                = new BufferedReader(new InputStreamReader(url_name.openStream()));
-
-        // reads system IPAddress 
-        systemipaddress = sc.readLine().trim();
-        return systemipaddress;
-    }
+//    public String getPublicIP() throws IOException {
+//
+//        // Find public IP address 
+//        String systemipaddress = "";
+//
+//        URL url_name = new URL("http://bot.whatismyipaddress.com");
+//
+//        BufferedReader sc
+//                = new BufferedReader(new InputStreamReader(url_name.openStream()));
+//
+//        // reads system IPAddress 
+//        systemipaddress = sc.readLine().trim();
+//        return systemipaddress;
+//    }
 
     private java.util.List<User> getUsers(byte[] content) {
         String string = new String(content);
@@ -244,7 +244,7 @@ public class LoginForm extends javax.swing.JFrame {
         String userPassword = txtPassword.getText();
         Boolean flag;
         if (!userName.isEmpty() && !userPassword.isEmpty()) {
-
+           
             String Login_info = "<" + userName + " " + userPassword + " " + ServerInfo.getIP() + ">";
             String[] request = {Tags.LOGIN, Login_info};
 

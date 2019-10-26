@@ -13,7 +13,7 @@ public class Tokenizer
      * It's different from the other parse method in that it checks left and right string first, which take higer
      * priority than the delimiter. For example, if left and right is ", for string a:b:1"c:d"2:3 ,
      * it returns { a, b, 1"c:d"2, 3 }
-     * @param left the openning tag of higher priority token
+     * @param left the opening tag of higher priority token
      * @param right the closing tag of higher priority token
      * @trimEachToken if true, each token will be trim by calling String.trim()
      */

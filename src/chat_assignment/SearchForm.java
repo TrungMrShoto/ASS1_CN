@@ -286,7 +286,7 @@ public class SearchForm extends javax.swing.JFrame {
 //        try {
 //            tblSearchoutput= new JTable(model);
 //                 
-//            conn = new Socket(InetAddress.getLocalHost(), 9000);
+//            conn = new Socket(ServerInfo.IP, 9000);
 //            reader = new TagReader(conn.getInputStream());  
 //            writer = new TagWriter(conn.getOutputStream()); 
 //            String[] request = {Tags.SEARCH, "<"+input+">"};
@@ -351,7 +351,7 @@ public class SearchForm extends javax.swing.JFrame {
         try {
 //            tblSearchoutput= new JTable(dm);
 
-            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            conn = new Socket(ServerInfo.IP, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             String[] request = {Tags.SEARCH, "<" + input + ">"};
@@ -539,7 +539,7 @@ class ButtonEditor extends DefaultCellEditor {
         String[] askF = {Tags.FIND_FRIEND, "<" + username + ">"};
         List<User> users = null;
         try {
-            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            conn = new Socket(ServerInfo.IP, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());
@@ -579,7 +579,7 @@ class ButtonEditor extends DefaultCellEditor {
         String[] askF = {Tags.REQUEST, "<" + AccountName + " " + FoundName + ">"};
         List<User> users = null;
         try {
-            conn = new Socket(InetAddress.getLocalHost(), 9000);
+            conn = new Socket(ServerInfo.IP, 9000);
             reader = new TagReader(conn.getInputStream());
             writer = new TagWriter(conn.getOutputStream());
             TagValue tv2 = new TagValue(askF[0], askF[1].getBytes());

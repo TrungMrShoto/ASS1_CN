@@ -22,3 +22,7 @@ internet-group-chat
 https://www.iconfinder.com/icons/118807/chat_group_icon
 yellow light blub
 https://www.iconfinder.com/icons/1511312/bulb_idea_idea_bulb_light_bulb_icon
+CreateGroup
+https://www.iconfinder.com/icons/2540586/add_comment_create_plus_icon
+SettingGroup
+https://www.iconfinder.com/icons/1041637/set_setting_icon

@@ -47,6 +47,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Create Group"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem4ActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -98,16 +101,16 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="Refresh" max="32767" attributes="0"/>
-                  <Component id="jTabbedPane2" pref="301" max="32767" attributes="0"/>
+                  <Component id="jTabbedPane2" pref="312" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="txtMessage" min="-2" pref="546" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="Send" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="File" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="Send" min="-2" pref="85" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="File" min="-2" pref="99" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane5" max="32767" attributes="0"/>
               </Group>
@@ -128,10 +131,10 @@
                   <Group type="102" attributes="0">
                       <Component id="jScrollPane5" max="32767" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txtMessage" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
-                          <Component id="Send" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="File" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="txtMessage" alignment="0" pref="36" max="32767" attributes="0"/>
+                          <Component id="Send" alignment="0" max="32767" attributes="0"/>
+                          <Component id="File" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -166,7 +169,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="326" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="345" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -194,7 +197,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="326" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="345" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -217,12 +220,12 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jPanel2">
+            <Container class="javax.swing.JPanel" name="GroupPanel">
 
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="298" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="491" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -262,7 +265,9 @@
     </Container>
     <Component class="javax.swing.JButton" name="Send">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jButton1"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/chat_assignment/res/iconfinder_send-01_186386.png"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="SendActionPerformed"/>
@@ -270,7 +275,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="File">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jButton2"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/chat_assignment/res/iconfinder_clip_115756.png"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="FileActionPerformed"/>

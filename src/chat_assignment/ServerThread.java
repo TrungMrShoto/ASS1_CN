@@ -10,11 +10,9 @@ public class ServerThread extends Thread{
 	private ServerSocket serverSocket;
 	private Set<ServerThreadThread> serverTTs = new HashSet<ServerThreadThread>();
 	
-        //, 100, InetAddress.getAllByName("0.0.0.0")
 	//Make SocketServer for the peer
 	public ServerThread(int portNumb) throws NumberFormatException, IOException {
-                //100 is the number of connections in 1 unit
-		serverSocket = new ServerSocket(portNumb, 100, InetAddress.getByName("0.0.0.0"));
+		serverSocket = new ServerSocket(portNumb,100,InetAddress.getByName("0.0.0.0"));
 	}
 	
 	public void run()
@@ -36,7 +34,6 @@ public class ServerThread extends Thread{
 	void sendMessage(String message) {
 		try {
 			serverTTs.forEach(t-> t.getPrintWriter().println(message));
-                       // System.out.println("++++++++++"+ message);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
