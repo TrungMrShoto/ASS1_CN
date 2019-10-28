@@ -1111,37 +1111,6 @@ public class ChatMainForm extends JFrame {
 
     }
 
-    private void Append_Message(String header, String content, Color headCol) {
-        if (!content.isEmpty()) {
-            Mess_header(header, headCol);
-            Mess_content(content);
-        }
-    }
-
-    private void Mess_header(String header, Color color) {
-//        if (!header.equals(final_sendUser)) {
-//            int len = txtMessLog.getDocument().getLength();
-//            txtMessLog.setCaretPosition(len);
-//            txtMessLog.setCharacterAttributes(MessageStyle.styleMessageContent(color, "San Francisco", 13), false);
-//            txtMessLog.replaceSelection(header + ":");
-//        } else {
-//            int len = txtMessLog.getDocument().getLength();
-//            txtMessLog.setCaretPosition(len);
-//            txtMessLog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.MAGENTA, "San Francisco", 13), false);
-//            for (int i = 0; i < header.length() + 3; i++) {
-//                txtMessLog.replaceSelection(" ");
-//            }
-//        }
-//        final_sendUser = header;
-    }
-
-    private void Mess_content(String content) {
-//        int len = txtMessLog.getDocument().getLength();
-//        txtMessLog.setCaretPosition(len);
-//        txtMessLog.setCharacterAttributes(MessageStyle.styleMessageContent(Color.darkGray, "San Francisco", 16), false);
-//        txtMessLog.replaceSelection(content + "\n");
-    }
-
     private void setIcon() {
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/chat_assignment/res/iconfinder_flower_1055057.png")));

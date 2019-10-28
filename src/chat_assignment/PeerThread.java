@@ -70,13 +70,13 @@ public class PeerThread extends Thread {
                                 message = message.substring(message.indexOf("<") + 2 + friend_name.length());
                                 fileName = message.substring(message.indexOf("<") + 1, message.indexOf(">"));
                                 message = message.substring(message.indexOf(">") + 1);
-                                FileWriter file = new FileWriter("d:\\Test\\" + fileName);
+                                FileWriter file = new FileWriter("d:\\" + fileName);
                                 PrintWriter writeToFile;
                                 writeToFile = new PrintWriter(file);
                                 writeToFile.print(message);
                                 writeToFile.close();
                                 private_chatHistory.append("[" + friend_name + "]:\t I just sent you a file which located in (d:\\" + fileName + ")" + "\n");
-                                public_chatHistory.setText(private_ChatGroup.getText());
+                                public_chatHistory.setText(private_chatHistory.getText());
                             } else {
                                 private_chatHistory.append(message + "\n");
                                 public_chatHistory.setText(private_chatHistory.getText());

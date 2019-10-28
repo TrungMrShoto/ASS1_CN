@@ -24,7 +24,7 @@ public class User {
         this.status = stauts;
     }
     
-        public User(int id, String user_name, String ip_addr, int stauts) {
+    public User(int id, String user_name, String ip_addr, int stauts) {
         this.id = id;
         this.user_name = user_name;
         this.ip_addr = ip_addr;
