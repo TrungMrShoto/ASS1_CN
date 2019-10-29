@@ -18,7 +18,7 @@ public class ServerInfo {
      *
      */
     private static ParseRoute pr = ParseRoute.getInstance();
-    public static String IP = "192.168.1.6";
+    public static String IP = "10.28.8.144";
     public static String getIP() throws UnknownHostException
     {
         return pr.getLocalIPAddress();
