@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -486,6 +487,7 @@ public class ChatMainForm extends JFrame {
         if (conditionOfChooseFile == JFileChooser.APPROVE_OPTION) {
             File file = new File(choosefile.getSelectedFile().getAbsolutePath());
             if (file.length() <= 5242880) {
+        
                 bis = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
                 //FileInputStream fis = new FileInputStream(file);
                 //bis = new BufferedInputStream(fis);
@@ -571,7 +573,7 @@ public class ChatMainForm extends JFrame {
         //BufferedReader bis;
         String input;
         input = buffer.readLine();
-        System.out.println(input);
+//        System.out.println(input);
 //        if (input.length() < 3 && input.contains("@f")) {
 //            JFileChooser choosefile = new JFileChooser("d:");
 //            choosefile.setAcceptAllFileFilterUsed(false);
